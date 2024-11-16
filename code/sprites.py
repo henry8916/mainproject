@@ -1,6 +1,6 @@
 import pygame.mouse
-from pygame.examples.multiplayer_joystick import player
-
+# from pygame.examples.multiplayer_joystick import player
+from math import atan2, degrees
 from settings import *
 
 class CollisionSprite(pygame.sprite.Sprite):
@@ -28,14 +28,21 @@ class Gun(pygame.sprite.Sprite):
         self.gun_surf = pygame.image.load(join('images','gun','gun.png')).convert_alpha()
         self.image = self.gun_surf
         self.rect = self.image.get_frect(center = self.player.rect.center + self.player_direction * self.distance)
+    def rotate_gun(self):
+        angle = degrees(atan2(self.player_direction.x, self.player_direction.y)) - 90
+        if self.player_direction.x>0:
+
+        self.image = pygame.transform.rotozoom(self.gun_surf, angle, 1)
     def get_direction(self):
         mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
         player_pos = pygame.Vector2((WINDOW_WIDTH/2,WINDOW_WIDTH/2))
         self.player_direction = (mouse_pos - player_pos).normalize()
     def update(self, dt):
+        self.get_direction()
+        self.rotate_gun()
         self.rect = self.image.get_frect(center = self.player.rect.center + self.player_direction * self.distance)
 
-
+#
 # class Enemy(pygame.sprite.Sprite):
 #     def __init__(self,pos, frames, groups, player, collision_sprites):
 #         super().__init__(groups)

@@ -4,7 +4,6 @@ from sprites import *
 from random import randint
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites
-
 class Game:
     def __init__(self):
         #settings
@@ -65,3 +64,4 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     game.run()
+
