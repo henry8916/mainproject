@@ -34,7 +34,7 @@ class Game:
             if obj.name =='Player':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
                 self.camera = Camera(self.player,self.all_sprites)
-                self.gun = Gun(self.player, self.all_sprites)
+                # self.gun = Gun(self.player, self.all_sprites)
 
     def run(self):
         while self.running:
