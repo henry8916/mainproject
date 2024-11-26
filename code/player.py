@@ -1,7 +1,9 @@
 import pygame
 from IPython.testing.tools import full_path
+from pygame import Vector2
 
 from settings import *
+from math import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites):
@@ -14,6 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.hitbox_rect = self.rect.inflate(-60,-90)
         self.clock = 0
         self.timedelay = False
+        self.gamestop = False
 
         #movement
         self.direction = pygame.Vector2(0,0)
@@ -73,6 +76,26 @@ class Player(pygame.sprite.Sprite):
             self.hitbox_rect.center += self.direction * 280
             self.rect.center = self.hitbox_rect.center
 
+    def specialattack(self):
+        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+            for i in range(41):
+                radius = 200
+                angle = 2*i*pi/20
+                deltadirection = pygame.Vector2(radius * cos(angle),radius * sin(angle))
+                PlayerClonespecial(self.rect.center + deltadirection , self.image, self.groups, 50*i, 1000, radius , angle)
+                PlayerClonespecial(self.rect.center - deltadirection , self.image, self.groups, 50*i, 1000, radius , pi + angle)
+
+    def specialattack2(self):
+        if pygame.key.get_just_pressed()[pygame.K_p]:
+            print('hello')
+            for i in range(21):
+                radius = 200
+                angle = 2*i*pi/20
+                deltadirection = pygame.Vector2(0,0)
+                PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle)
+
+
+
     def animate(self,dt):
         #get state
         if self.direction.x != 0:
@@ -92,6 +115,8 @@ class Player(pygame.sprite.Sprite):
         self.animate(dt)
         self.move(dt)
         self.teleporting()
+        self.specialattack()
+        self.specialattack2()
 #
 class PlayerClone(pygame.sprite.Sprite):
     def __init__(self, pos ,surf, groups,start, life):
@@ -108,9 +133,72 @@ class PlayerClone(pygame.sprite.Sprite):
             self.image.set_alpha(100)
 
     def update(self,dt):
-        if (pygame.time.get_ticks()-self.clock) > self.start+ 150:
+        if (pygame.time.get_ticks()-self.clock) > self.start+ self.life:
             self.kill()
         self.setalpha()
+
+
+class PlayerClonespecial(pygame.sprite.Sprite):
+    def __init__(self, pos ,surf, groups,start, life, radius, angle):
+        super().__init__(groups)
+        self.image = pygame.transform.grayscale(surf)
+        self.image.set_alpha(0)
+        self.rect = self.image.get_frect(center = pos)
+        self.clock = pygame.time.get_ticks()
+        self.life = life
+        self.start = start
+        self.direction = Vector2(-cos(angle), -sin(angle))
+        self.radius = radius
+        self.position = Vector2(self.rect.center)
+
+    def setalpha(self):
+        if (pygame.time.get_ticks()-self.clock) > self.start:
+            self.image.set_alpha(100)
+
+    def move(self):
+        self.rect.center += self.direction * self.radius /1000 * 100
+
+
+    def update(self,dt):
+        # self.life = dt * self.radius * 1000
+        self.move()
+        # if (pygame.time.get_ticks()-self.clock) > self.start+ self.life:
+        #     self.kill()
+        if self.position.distance_to(self.rect.center) >= self.radius:
+            self.kill()
+        self.setalpha()
+
+class PlayerClonespecial2(pygame.sprite.Sprite):
+    def __init__(self, pos ,surf, groups,start, life, radius, angle):
+        super().__init__(groups)
+        self.image = pygame.transform.grayscale(surf)
+        self.image.set_alpha(0)
+        self.rect = self.image.get_frect(center = pos)
+        self.clock = pygame.time.get_ticks()
+        self.life = life
+        self.start = start
+        self.direction = Vector2(-cos(angle), -sin(angle))
+        self.radius = radius
+        self.position = Vector2(self.rect.center)
+
+    def setalpha(self):
+        if (pygame.time.get_ticks()-self.clock) > self.start:
+            self.image.set_alpha(100)
+
+    def move(self):
+        if (pygame.time.get_ticks()-self.clock) > 2000 - self.start:
+            self.rect.center += self.direction * self.radius /1000 * 100
+
+
+    def update(self,dt):
+        # self.life = dt * self.radius * 1000
+
+        if (pygame.time.get_ticks()-self.clock) > self.start+ self.life:
+            self.kill()
+        if self.position.distance_to(self.rect.center) <= self.radius:
+            self.move()
+        self.setalpha()
+
 
 
 class Camera(pygame.sprite.Sprite):
