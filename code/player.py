@@ -1,5 +1,4 @@
 import pygame
-from IPython.testing.tools import full_path
 from pygame import Vector2
 
 from settings import *

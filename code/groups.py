@@ -1,4 +1,3 @@
-from datashader.datashape import object_
 
 from settings import *
 
