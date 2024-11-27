@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="5" height="6" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="17">
+ <tileset firstgid="1" source="Tiletsx/Room_Builder_free_32x32.tsx"/>
+ <tileset firstgid="392" source="Tiletsx/interior.tsx"/>
+ <layer id="1" name="Ground" width="5" height="6">
+  <data encoding="csv">
+187,187,187,187,187,
+187,187,187,187,187,
+187,187,187,187,187,
+187,187,187,187,187,
+187,187,187,187,187,
+13,13,187,13,13
+</data>
+ </layer>
+ <objectgroup id="3" name="Objects">
+  <object id="12" gid="394" x="27.5" y="50" width="36" height="84"/>
+  <object id="13" gid="393" x="4" y="94" width="45" height="87"/>
+  <object id="14" gid="392" x="101" y="140" width="59" height="60"/>
+  <object id="15" gid="395" x="106.5" y="50.5" width="57" height="75"/>
+ </objectgroup>
+ <objectgroup id="4" name="Collision">
+  <object id="3" x="-218" y="-404" width="620" height="403"/>
+  <object id="4" x="161" y="-358" width="404" height="763"/>
+  <object id="5" x="-285" y="-259" width="286" height="724"/>
+  <object id="7" x="-141" y="193" width="204" height="277"/>
+  <object id="8" x="96" y="192.5" width="164.5" height="236"/>
+ </objectgroup>
+ <objectgroup id="5" name="Transition">
+  <object id="9" x="64.3333" y="188.333" width="31.6667" height="3.33333"/>
+  <object id="10" x="213.5" y="178"/>
+ </objectgroup>
+ <objectgroup id="7" name="Sleep">
+  <object id="16" x="3" y="33" width="54" height="71.5"/>
+ </objectgroup>
+</map>
