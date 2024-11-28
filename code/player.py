@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         self.state, self.frame_index = 'down', 0
         self.image  = pygame.image.load(join('images','player','down','0.png')).convert_alpha()
         self.rect = self.image.get_frect(center = pos)
-        self.hitbox_rect = self.rect.inflate(-60,-90)
+        self.hitbox_rect = self.rect.inflate(-50,-80)
         self.clock = 0
         self.timedelay = False
         self.gamestop = False
@@ -208,21 +208,3 @@ class Camera(pygame.sprite.Sprite):
     def update(self,dt):
         if not self.player.timedelay:
             self.pos = self.player.rect.center
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
