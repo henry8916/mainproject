@@ -15,6 +15,13 @@ class Sprite(pygame.sprite.Sprite):
         self.image = surf
         self.rect = self.image.get_frect(topleft=pos)
         self.ground = True
+class TransitionSprite(Sprite):
+    def __init__(selfself, pos, size, target, groups):
+        super().__init__(pos,surf,groups)
+        surf=pygmae.Surface(size)
+        self.target=target
+
+
 
 # class Gun(pygame.sprite.Sprite):
 #     def __init__(self,player,groups):

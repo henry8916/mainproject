@@ -86,7 +86,6 @@ class Player(pygame.sprite.Sprite):
 
     def specialattack2(self):
         if pygame.key.get_just_pressed()[pygame.K_p]:
-            print('hello')
             for i in range(21):
                 radius = 200
                 angle = 2*i*pi/20
