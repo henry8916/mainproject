@@ -18,25 +18,28 @@ class Game:
         self.collision_sprites = pygame.sprite.Group()
 
         self.setup()
-
         #sprites
     def setup(self):
-        map = load_pygame(join('data','maps','world.tmx'))
+        # map = load_pygame(join('data','maps','world.tmx'))
         holesmap = load_pygame(join('holesmap','mainmap.tmx'))
-        for x,y,image in holesmap.get_layer_by_name('Tile Layer 1').tiles():
+        for x,y,image in holesmap.get_layer_by_name('Ground').tiles():
             Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
-        for x,y,image in holesmap.get_layer_by_name('on the building').tiles():
-            Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
-        for x,y,image in holesmap.get_layer_by_name('buuilding').tiles():
-            Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
-        for x,y,image in holesmap.get_layer_by_name('basic building').tiles():
-            Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
-
-
+        # for x,y,image in holesmap.get_layer_by_name('Collisionn').objects:
+        #     Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
+        # for x,y,image in holesmap.get_layer_by_name('Objects').objects:
+        #     Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
+        # for x,y,image in holesmap.get_layer_by_name('Transition').objects:
+        #     Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
         # for x,y,image in map.get_layer_by_name('Ground').tiles():
         #     Sprite((x*TILE_SIZE,y*TILE_SIZE), image, self.all_sprites)
         # for obj in map.get_layer_by_name('Objects'):
         #     CollisionSprite((obj.x, obj.y),obj.image,(self.all_sprites, self.collision_sprites))
+        # for obj in holesmap.get_layer_by_name('Collision'):
+        #     CollisionSprite((obj.x, obj.y),obj.image,(self.all_sprites, self.collision_sprites))
+        for obj in holesmap.get_layer_by_name('Transition'):
+            Sprite((obj.x, obj.y),obj.image,(self.all_sprites, self.collision_sprites))
+        for obj in holesmap.get_layer_by_name('Objects'):
+            Sprite((obj.x, obj.y),obj.image,(self.all_sprites, self.collision_sprites))
 
         # for obj in map.get_layer_by_name('Collisions'):
         #     CollisionSprite((obj.x,obj.y), pygame.Surface((obj.width,obj.height)),self.collision_sprites)
