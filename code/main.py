@@ -4,7 +4,8 @@ from sprites import *
 from random import randint
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites
-
+from tool import *
+from support import *
 class Game:
     def __init__(self):
         #settings
@@ -14,6 +15,12 @@ class Game:
         pygame.display.set_caption('Holes')
         self.clock = pygame.time.Clock()
         self.running = True
+
+        # tool
+        self.player_tools={
+            0:Tool('Shovel',1),
+            1:Tool('Gun',1),
+        }
 
         # groups
         self.all_sprites = AllSprites()
@@ -31,10 +38,24 @@ class Game:
         self.import_assets()
         self.setup(self.tmx_maps['world'],'tent')
 
-
+        #overlay
+        self.tool_index=ToolIndex(self.player_tools,self.fonts,self.tool_Frames)
+        self.index_open=False
 
     def import_assets(self):
         self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx'))}
+
+        self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
+                           'tools': {}
+        }
+        print(self.tool_Frames['icons'])
+
+        self.fonts={
+            'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
+            'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
+            'small':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),14),
+            'bold':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),40)
+        }
 
 
         #sprites
@@ -67,6 +88,14 @@ class Game:
                 self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites)
                 self.camera = Camera(self.player,self.all_sprites)
                 # self.gun = Gun(self.player, self.all_sprites)
+
+
+    def input(self):
+
+        if pygame.key.get_just_pressed()[pygame.K_RETURN]:
+            self.index_open = not self.index_open
+            self.player.blocked=not self.player.blocked
+
 
     # transition system
     def transition_check(self):
@@ -103,6 +132,7 @@ class Game:
                     self.running = False
             #update
             if not self.player.gamestop:
+                self.input()
                 self.transition_check()
                 self.all_sprites.update(dt)
 
@@ -115,12 +145,17 @@ class Game:
                     pass
                 self.player.timedelay = False
 
+            # overlays
+            #if self.dialog_tree: self.dialog_tree.update()s
+            if self.index_open: self.tool_index.update(dt)
+
+
+
             self.tint_screen(dt)
             pygame.display.update()
 
 
-            #overlays
-            #if self.dialog_tree: self.dialog_tree.update()
+
 
 
 
