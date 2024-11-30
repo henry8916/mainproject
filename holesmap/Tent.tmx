@@ -25,7 +25,7 @@
   <object id="9" x="64.3333" y="188.333" width="31.6667" height="3.33333">
    <properties>
     <property name="pos" value="tent"/>
-    <property name="target" value="wotld"/>
+    <property name="target" value="world"/>
    </properties>
   </object>
  </objectgroup>

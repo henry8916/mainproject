@@ -16,6 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.clock = 0
         self.timedelay = False
         self.gamestop = False
+        self.blocked=False
 
         #movement
         self.direction = pygame.Vector2(0,0)
@@ -92,6 +93,13 @@ class Player(pygame.sprite.Sprite):
                 deltadirection = pygame.Vector2(0,0)
                 PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle)
 
+    def block(self):
+        self.blocked = True
+        self.direction = Vector2(0, 0)
+
+    def unblock(self):
+        self.blocked = False
+
 
 
     def animate(self,dt):
@@ -108,13 +116,14 @@ class Player(pygame.sprite.Sprite):
         self.image = self.frames[self.state][int(self.frame_index)%len(self.frames[self.state])]
 
     def update(self,dt):
-        self.running()
-        self.input()
-        self.animate(dt)
-        self.move(dt)
-        self.teleporting()
-        self.specialattack()
-        self.specialattack2()
+        if not self.blocked:
+            self.running()
+            self.input()
+            self.animate(dt)
+            self.move(dt)
+            self.teleporting()
+            self.specialattack()
+            self.specialattack2()
 #
 class PlayerClone(pygame.sprite.Sprite):
     def __init__(self, pos ,surf, groups,start, life):

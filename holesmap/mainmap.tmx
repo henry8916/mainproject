@@ -138,7 +138,7 @@
    </properties>
    <point/>
   </object>
-  <object id="283" name="Player" x="542.667" y="762.667">
+  <object id="283" name="Player" x="542.667" y="800.667">
    <properties>
     <property name="direction" value="down"/>
     <property name="pos" value="wardenhouse"/>
