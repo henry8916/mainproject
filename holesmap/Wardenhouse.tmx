@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="18">
+ <tileset firstgid="1" source="Tiletsx/Room_Builder_free_32x32.tsx"/>
+ <tileset firstgid="392" source="Tiletsx/interior.tsx"/>
+ <layer id="1" name="Ground" width="20" height="10">
+  <data encoding="csv">
+29,196,196,196,196,196,196,196,196,196,196,196,196,196,196,196,196,196,196,31,
+46,213,213,213,213,213,213,213,213,213,213,213,213,213,213,213,213,213,213,48,
+46,131,132,132,132,132,132,132,132,132,132,132,132,132,132,132,132,132,132,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+63,64,64,64,64,64,64,64,64,97,98,64,64,64,64,64,64,64,64,65
+</data>
+ </layer>
+ <objectgroup id="2" name="Entities">
+  <object id="1" name="Player" x="319" y="296">
+   <properties>
+    <property name="direction" value="up"/>
+    <property name="pos" value="world"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="5" name="Collision">
+  <object id="13" x="-147" y="-173" width="874" height="220"/>
+  <object id="14" x="-160" y="-160" width="187" height="581"/>
+  <object id="15" x="618" y="-87" width="187" height="496"/>
+  <object id="16" x="-96" y="296" width="380" height="157"/>
+  <object id="17" x="354" y="293" width="350" height="179"/>
+ </objectgroup>
+ <objectgroup id="4" name="Objects">
+  <object id="5" gid="393" x="31" y="132" width="45" height="87"/>
+  <object id="6" gid="395" x="561" y="92" width="57" height="75"/>
+  <object id="7" gid="395" x="524" y="92" width="57" height="75"/>
+  <object id="10" gid="395" x="486" y="92" width="57" height="75"/>
+  <object id="11" gid="394" x="42" y="172" width="36" height="84"/>
+  <object id="12" gid="394" x="572.667" y="145.333" width="36" height="84"/>
+ </objectgroup>
+ <objectgroup id="3" name="Transition">
+  <object id="2" x="289" y="302" width="60" height="15">
+   <properties>
+    <property name="pos" value="wardenhouse"/>
+    <property name="target" value="world"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
