@@ -58,3 +58,9 @@ def draw_bar(surface, rect, value, max_value, color, bg_color, radius = 1):
 	progress_rect = pygame.FRect(rect.topleft, (progress,rect.height))
 	pygame.draw.rect(surface, bg_color, bg_rect, 0, radius)
 	pygame.draw.rect(surface, color, progress_rect, 0, radius)
+
+def draw_text_in_box(surface, rect, bg_color,txt_surf, radius = 1):
+	bg_rect = rect.copy()
+	pygame.draw.rect(surface, bg_color, bg_rect, 0, radius)
+	txt_rect=txt_surf.get_frect(center=bg_rect.center)
+	surface.blit(txt_surf,txt_rect)

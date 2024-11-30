@@ -39,6 +39,7 @@ TOOL_DATA={
     },
     'Gun':{
         'level':{
+            0:{'plusdamage':0, 'digspeed':0, 'skill':False },
             1:{'plusdamage':5, 'digspeed':0, 'skill':False },
             2:{'plusdamage':10, 'digspeed':0, 'skill':False},
             3:{'plusdamage':15, 'digspeed':0, 'skill':False},
@@ -52,16 +53,17 @@ TOOL_DATA={
 
         },
         'guide':{
-            1: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\n아직은 기본적인 공격만 할 수 있다',
-            2: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 아직은 기본적인 공격만 할 수 있다',
-            3: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
-            4: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
-            5: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
-            6: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
-            7: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
-            8: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
-            9: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
-            10: 'Mr.Sir에게서 훔친 총,\Mr.Sir이 Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다'
+            0: '아직 쓸 수 없는 아이템,\nMr.Sir을 만나면 얻을 수 있을 것 같다',
+            1: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\n아직은 기본적인 공격만 할 수 있다',
+            2: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 아직은 기본적인 공격만 할 수 있다',
+            3: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
+            4: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
+            5: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
+            6: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
+            7: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
+            8: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
+            9: 'Mr.Sir에게서 훔친 총,\nYellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다',
+            10: 'Mr.Sir에게서 훔친 총,\Yellow-spotted lizard를 잡을 때 사용한다\ 어느정도 강한 공격을 할 수 있다'
         }
     }
 }

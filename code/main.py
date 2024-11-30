@@ -19,7 +19,7 @@ class Game:
         # tool
         self.player_tools={
             0:Tool('Shovel',1),
-            1:Tool('Gun',1),
+            1:Tool('Gun',0),
         }
 
         # groups
@@ -54,7 +54,8 @@ class Game:
             'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
             'small':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),14),
-            'bold':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),40)
+            'bold':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),40),
+            'explain': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 25)
         }
 
 

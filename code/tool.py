@@ -16,7 +16,8 @@ class Tool:
         self.digspeed=TOOL_DATA[name]['level'][level]['digspeed']
         self.plusdamage=TOOL_DATA[name]['level'][level]['plusdamage']
         self.skill=TOOL_DATA[name]['level'][level]['skill']
-
+        self.stat=[self.plusdamage,self.digspeed,self.skill]
+        self.guide=TOOL_DATA[name]['guide'][level]
 
     def unlock_skill(self):
         if self.level>=5:
@@ -29,8 +30,8 @@ class Tool:
         self.digspeed = TOOL_DATA[name]['level'][self.level]['digspeed']
         self.plusdamage = TOOL_DATA[name]['level'][self.level]['plusdamage']
         self.skill = TOOL_DATA[name]['level'][self.level]['skill']
-
-
+        self.guide = TOOL_DATA[name]['guide'][self.level]
+        self.stat = [self.plusdamage, self.digspeed, self.skill]
 
 class ToolIndex:
     def __init__(self,tool,fonts,tool_frames):
@@ -116,11 +117,14 @@ class ToolIndex:
         shadow_surf.set_alpha(100)
         self.display_surface.blit(shadow_surf,(self.main_rect.left+self.list_width-4,self.main_rect.top))
 
-    def display_main(self,dt):
+    def display_main(self):
         tool=self.tool[self.index]
 
         #main rect
+
         rect=pygame.FRect(self.main_rect.left + self.list_width,self.main_rect.top, self.main_rect.width - self.list_width, self.main_rect.height)
+        surf=pygame.Surface((rect.width,rect.height))
+        surf.set_alpha(200)
         pygame.draw.rect(self.display_surface, COLORS['dark'], rect, 0, 12,0, 12,0)
 
         #display your image and item image
@@ -149,14 +153,29 @@ class ToolIndex:
             color=COLORS['white'],
             bg_color=COLORS['black']
         )
-        level1_surf = self.fonts['regular'].render(f'max \nlevel', False, COLORS['white'])
+        level1_surf = self.fonts['regular'].render(f'max \nlevel', False, COLORS['gold'])
         level1_rect = level1_surf.get_frect(topleft=top_rect.midbottom + Vector2(200, 0))
         self.display_surface.blit(level1_surf, level1_rect)
 
+
+
+        #ablility and skill
+        for i in range(len(tool.stat)):
+            draw_text_in_box(
+                surface=self.display_surface,
+                rect=pygame.FRect(0,0,200,40).move_to(midbottom=rect.midbottom+Vector2(0,-40*i-10)),
+                bg_color=COLORS['white'],
+                txt_surf=self.fonts['regular'].render(f'{tool.stat[i]}', False, COLORS['black']),
+                )
+
+
         #how to use
-
-
-
+        guide_surf = self.fonts['explain'].render(tool.guide, False, COLORS['white'])
+        guide_rect = level_surf.get_frect(topleft=top_rect.bottomleft + Vector2(0, 80))
+        self.display_surface.blit(guide_surf, guide_rect)
+        #쓸 수 없는 아이템
+        if tool.level==0:
+            self.display_surface.blit(surf,rect.topleft)
 
 
     def update(self,dt):
@@ -168,5 +187,5 @@ class ToolIndex:
         #tint the main game
         #display the list
         self.display_list()
-        self.display_main(dt)
+        self.display_main()
 
