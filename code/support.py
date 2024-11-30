@@ -51,8 +51,10 @@ def import_tilemap(cols, rows, *path):
 
 
 #xp 진행 정도 나타내기 player상태창에 이용
-def draw_bar(surface,rect,value,max_value,color,bg_color,radius=1):
-	ratio = rect.width/max_value
-	bg_rect=rect.copy()
-	progress_rect = pygame.FRect(rect.topleft,(value*ratio,rect.height))
-	pygame.draw.rect(surface,color,progress_rect, 0, radius)
+def draw_bar(surface, rect, value, max_value, color, bg_color, radius = 1):
+	ratio = rect.width / max_value
+	bg_rect = rect.copy()
+	progress = max(0, min(rect.width,value * ratio))
+	progress_rect = pygame.FRect(rect.topleft, (progress,rect.height))
+	pygame.draw.rect(surface, bg_color, bg_rect, 0, radius)
+	pygame.draw.rect(surface, color, progress_rect, 0, radius)

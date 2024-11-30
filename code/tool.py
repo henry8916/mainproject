@@ -1,23 +1,35 @@
 import pygame.draw
 from dask.array import left_shift
-
-from settings import *
 from pygame import Vector2
 from pygments.styles.gh_dark import GRAY_3
 from pygments.styles.lightbulb import COLORS
-
+from game_data import TOOL_DATA,PLAYER_DATA
 from settings import *
+from support import *
 
+#장비 클래스 삽이랑 총 자동차는 모르겠음
 class Tool:
     def __init__(self, name, level):
-        self.locked=True, self.name,self.level=name,level
+        self.locked=True
+        self.name,self.level=name,level
         # stats
-        self.digspeedplus=
-        self.damageplus=
+        self.digspeed=TOOL_DATA[name]['level'][level]['digspeed']
+        self.plusdamage=TOOL_DATA[name]['level'][level]['plusdamage']
+        self.skill=TOOL_DATA[name]['level'][level]['skill']
 
 
-    def unlocktools(self):
-        self.locked=False
+    def unlock_skill(self):
+        if self.level>=5:
+            self.locked=False
+
+    def tool_level_up(self,name):
+        self.level+=1
+        self.unlock_skill()
+        # stats
+        self.digspeed = TOOL_DATA[name]['level'][self.level]['digspeed']
+        self.plusdamage = TOOL_DATA[name]['level'][self.level]['plusdamage']
+        self.skill = TOOL_DATA[name]['level'][self.level]['skill']
+
 
 
 class ToolIndex:
@@ -113,7 +125,7 @@ class ToolIndex:
 
         #display your image and item image
         #item 모습
-        top_rect = pygame.FRect(rect.topleft,(rect.width,rect.height*0.4))
+        top_rect = pygame.FRect(rect.topleft,(rect.width,rect.height*0.3))
         pygame.draw.rect(self.display_surface, COLORS['red'],top_rect,0,0,0,12)
 
         tool_surf =self.tool_frames[tool.name]
@@ -126,11 +138,23 @@ class ToolIndex:
         self.display_surface.blit(name_surf,name_rect)
 
         #level
-        level_surf = self.fonts['regular'].render(f'level:{tool.level}', False, COLORS['white'])
+        level_surf = self.fonts['regular'].render(f'level: {tool.level}/10', False, COLORS['white'])
         level_rect = level_surf.get_frect(topleft=top_rect.bottomleft+Vector2(10,-20))
         self.display_surface.blit(level_surf, level_rect)
+        draw_bar(
+            surface=self.display_surface,
+            rect=pygame.FRect(0,0,400,30).move_to(center=top_rect.midbottom+Vector2(-20,20)),
+            value=tool.level,
+            max_value=10,
+            color=COLORS['white'],
+            bg_color=COLORS['black']
+        )
+        level1_surf = self.fonts['regular'].render(f'max \nlevel', False, COLORS['white'])
+        level1_rect = level1_surf.get_frect(topleft=top_rect.midbottom + Vector2(200, 0))
+        self.display_surface.blit(level1_surf, level1_rect)
 
-        #level and how to use
+        #how to use
+
 
 
 
