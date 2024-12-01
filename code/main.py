@@ -23,9 +23,15 @@ class Game:
         }
 
         # groups
+        #모든 스프라이트들 그룹
         self.all_sprites = AllSprites()
+        #충돌 스트라이프들 그룹
         self.collision_sprites = pygame.sprite.Group()
+        #멥 변환 발판들 그룹
         self.transition_sprites = pygame.sprite.Group()
+        #땅팔 수 있는 모래들 그룹
+        self.sand_sprites=AllSprites()
+
 
         # transition/tint
         self.transition_target = None
@@ -37,15 +43,14 @@ class Game:
 
 
         self.import_assets()
-        self.setup(self.tmx_maps['world'],'tent')
+        self.setup(self.tmx_maps['world'],'tent','world')
 
         #overlay
         self.tool_index=ToolIndex(self.player_tools,self.fonts,self.tool_Frames)
         self.index_open=False
 
     def import_assets(self):
-        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx'))}
-
+        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx'))}
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
@@ -61,7 +66,7 @@ class Game:
 
 
         #sprites
-    def setup(self, tmx_map, player_start_pos):
+    def setup(self, tmx_map, player_start_pos,map):
 
 
         #map clear
@@ -71,10 +76,15 @@ class Game:
 
         for obj in tmx_map.get_layer_by_name('Objects'):
             CollisionSprite((obj.x*2, obj.y*2),doublingimage(obj.image),(self.all_sprites, self.collision_sprites))
+        if map=='hole':
+            for obj in tmx_map.get_layer_by_name('Sand'):
+                SandSprite((obj.x * 2, obj.y * 2), doublingimage(obj.image), (self.all_sprites, self.sand_sprites))
 
         #gound
         for x,y,image in tmx_map.get_layer_by_name('Ground').tiles():
             Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
+
+
 
 
         #collision sprite
@@ -83,15 +93,17 @@ class Game:
         #transision
         for obj in tmx_map.get_layer_by_name('Transition'):
             # print(obj.properties)
-            TransitionSprite((obj.x*2, obj.y*2),(obj.width*2,obj.height*2), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
+            TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
+
+
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
-                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites)
+                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites)
                 self.camera = Camera(self.player,self.all_sprites)
                 # self.gun = Gun(self.player, self.all_sprites)
 
-
+    #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     def input(self):
 
         if pygame.key.get_just_pressed()[pygame.K_RETURN]:
@@ -115,7 +127,7 @@ class Game:
             self.tint_progress += self.tint_speed*dt
             if self.tint_progress>=255:
                 print(self.transition_target)
-                self.setup(self.tmx_maps[self.transition_target[0]],self.transition_target[1])
+                self.setup(self.tmx_maps[self.transition_target[0]],self.transition_target[1],self.transition_target[0])
                 self.tint_mode='untint'
                 self.transition_target=None
         self.tint_progress =max(0,min(self.tint_progress,255))
@@ -125,18 +137,28 @@ class Game:
 
     def run(self):
         while self.running:
-            #dt
+
             dt = self.clock.tick() / 1000
             self.display_surface.fill('black')
+
             #event loop
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_o:
+                    self.key_down_time = pygame.time.get_ticks()  # O 키를 눌렀을 때 시간 기록
+
+                if event.type == pygame.KEYUP and event.key == pygame.K_o:
+                    self.t = pygame.time.get_ticks()-self.key_down_time# O 키를 뗐을 때 초기화
+                    self.player.use_shovel(self.t)
+
+
             #update
             if not self.player.gamestop:
                 self.input()
                 self.transition_check()
                 self.all_sprites.update(dt)
+                self.player.update(dt)
 
 
             #draw

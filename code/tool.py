@@ -82,6 +82,7 @@ class ToolIndex:
             bg_color=COLORS['gray']  if self.index !=index else COLORS['light']
             text_color=COLORS['white'] if self.selected_index !=index else COLORS['gold']
 
+
             top = self.main_rect.top+index*self.item_height
             item_rect = pygame.FRect(self.main_rect.left,top,self.list_width,self.item_height)
 

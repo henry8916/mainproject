@@ -5,7 +5,7 @@ from settings import *
 from math import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self,pos, groups, collision_sprites):
+    def __init__(self,pos, groups, collision_sprites, sand_sprites):
         super().__init__(groups)
         self.groups = groups
         self.load_images()
@@ -23,6 +23,15 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2(0,0)
         self.speed = 500
         self.collision_sprites = collision_sprites
+
+        #tools
+        self.tools=['Shovel','Gun']
+        self.tool_index= 0
+        self.selected_tool = self.tools[self.tool_index]
+        #interaction
+        self.sand_sprites=sand_sprites
+        self.key_down_time=0 #땅파기 시작
+        self.key_up_time=0 #땅파기 끝
 
     def load_images(self):
         self.frames = {'left': [], 'right':[] , 'up':[],'down':[]}
@@ -60,11 +69,30 @@ class Player(pygame.sprite.Sprite):
                         self.hitbox_rect.bottom = sprite.rect.top
                     elif self.direction.y < 0:
                         self.hitbox_rect.top = sprite.rect.bottom
+
+    #모래 파기
+    def use_shovel(self,t):
+        keys = pygame.key.get_pressed()
+        if self.selected_tool == 'Shovel':
+            for sand in self.sand_sprites.sprites():
+                if sand.rect.collidepoint(self.target_pos):
+                    if t>=1000:
+                        print('hello')
+                        sand.damage()
+
+
+
+
+    def get_target_pos(self):
+        self.target_pos= self.rect.center
+
+
     def running(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LCTRL]:
-            self.speed =1000
-        else: self.speed = 500
+            self.speed =400
+        else: self.speed = 200
+
     def teleporting(self):
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_LSHIFT]:
@@ -109,16 +137,16 @@ class Player(pygame.sprite.Sprite):
         if self.direction.y != 0:
             self.state = 'down' if self.direction.y>0 else 'up'
 
-
-
         #animate
         self.frame_index = self.frame_index + self.speed//(400//len(self.frames[self.state]))*dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index)%len(self.frames[self.state])]
+
 
     def update(self,dt):
         if not self.blocked:
             self.running()
             self.input()
+            self.get_target_pos()
             self.animate(dt)
             self.move(dt)
             self.teleporting()
