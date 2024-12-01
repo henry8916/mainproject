@@ -3,3 +3,4 @@ pip intstall pygame-ce
 pip install pytmx
 pip install tool
 pip install pygments
+pip install dask
