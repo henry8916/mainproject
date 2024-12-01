@@ -10,6 +10,11 @@ def doublingimage(image):
     scaled_image = pygame.transform.scale(image, (original_width * 2, original_height * 2))
     return scaled_image
 
+def smallerimage(image):
+    original_width, original_height = image.get_size()
+    scaled_image = pygame.transform.scale(image, (original_width * 128 / 500, original_height * 128 / 500 ))
+    return scaled_image
+
 COLORS = {
 	'white': '#f4fefa',
 	'pure white': '#ffffff',
