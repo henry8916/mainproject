@@ -35,6 +35,7 @@ class Game:
         self.tint_direction=-1
         self.tint_speed = 600
 
+
         self.import_assets()
         self.setup(self.tmx_maps['world'],'tent')
 

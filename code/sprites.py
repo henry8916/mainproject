@@ -24,6 +24,7 @@ class TransitionSprite(Sprite):
 
 
 
+
 # class Gun(pygame.sprite.Sprite):
 #     def __init__(self,player,groups):
 #         #player connection

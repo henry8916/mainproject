@@ -159,6 +159,7 @@ class ToolIndex:
 
 
 
+
         #ablility and skill
         for i in range(len(tool.stat)):
             draw_text_in_box(

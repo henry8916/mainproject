@@ -50,6 +50,7 @@ def import_tilemap(cols, rows, *path):
 	return frames
 
 
+
 #xp 진행 정도 나타내기 player상태창에 이용
 def draw_bar(surface, rect, value, max_value, color, bg_color, radius = 1):
 	ratio = rect.width / max_value
