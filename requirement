@@ -1,0 +1,6 @@
+pip uninstall pygame
+pip intstall pygame-ce
+pip install pytmx
+pip install tool
+pip install os
+pip install pygments
