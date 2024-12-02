@@ -32,6 +32,9 @@ class Game:
         self.collision_sprites = pygame.sprite.Group()
         #멥 변환 발판들 그룹
         self.transition_sprites = pygame.sprite.Group()
+        # 멥 변환 발판들 그룹
+        self.attack_sprites = pygame.sprite.Group()
+        self.attackstanley_sprites = pygame.sprite.Group()
         #땅팔 수 있는 모래들 그룹aa
         self.sand_sprites=AllSprites()
 
@@ -89,23 +92,24 @@ class Game:
             Sprite((x*TILE_SIZE,y*TILE_SIZE), doublingimage(image), self.all_sprites)
 
 
-
-
         #collision sprite
         for obj in tmx_map.get_layer_by_name('Collision'):
             CollisionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)),self.collision_sprites)
         #transision
         for obj in tmx_map.get_layer_by_name('Transition'):
-
             # print(obj.properties)
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
 
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
-                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.player_tools)
+                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools)
                 self.camera = Camera(self.player,self.all_sprites)
                 # self.gun = Gun(self.player, self.all_sprites)
+            if obj.name == 'Character':
+                print('hello')
+                print('hello')
+                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     def input(self):
