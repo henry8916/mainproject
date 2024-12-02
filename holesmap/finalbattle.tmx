@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="14">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="15">
  <tileset firstgid="1" source="Tilesets/TilesetFloor32.tsx"/>
  <layer id="1" name="Ground" width="40" height="40">
   <data encoding="csv">
@@ -45,17 +45,18 @@
 24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24
 </data>
  </layer>
- <objectgroup id="2" name="Entities"/>
- <objectgroup id="3" name="Objects"/>
- <objectgroup id="4" name="Transition"/>
- <objectgroup id="5" name="Collision">
-  <object id="6" name="Player" x="640" y="970">
+ <objectgroup id="2" name="Entities">
+  <object id="14" name="Player" x="638" y="956">
    <properties>
     <property name="direction" value="up"/>
     <property name="pos" value="world"/>
    </properties>
    <point/>
   </object>
+ </objectgroup>
+ <objectgroup id="3" name="Objects"/>
+ <objectgroup id="4" name="Transition"/>
+ <objectgroup id="5" name="Collision">
   <object id="9" x="1276" y="-900" width="848" height="3080"/>
   <object id="10" x="-764" y="1260" width="3272" height="788"/>
   <object id="12" x="-920" y="-940" width="916" height="3012"/>

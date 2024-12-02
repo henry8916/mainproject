@@ -53,7 +53,7 @@ class Game:
         self.index_open=False
 
     def import_assets(self):
-        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx'))}
+        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx'))}
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
@@ -151,12 +151,12 @@ class Game:
                     self.running = False
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_o:
                     self.key_down_time = pygame.time.get_ticks()  # O 키를 눌렀을 때 시간 기록
-
+                    self.player.blocked=True
                 if event.type == pygame.KEYUP and event.key == pygame.K_o:
                     self.t = pygame.time.get_ticks()-self.key_down_time# O 키를 뗐을 때 초기화
                     self.player.use_shovel(self.t)
                     self.key_down_time=0
-
+                    self.player.blocked = False
 
                 self.player.mousedbuttondown = True if event.type == pygame.MOUSEBUTTONDOWN else False
                 self.player.mousedbuttonup = True if event.type == pygame.MOUSEBUTTONUP else False
