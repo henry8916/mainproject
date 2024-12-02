@@ -67,6 +67,7 @@ TOOL_DATA={
     }
 }
 
+
 STAT_DATA={
             0:{'max_hp':100, 'need_xp':100, 'max_thirst':10 },
             1:{'max_hp':120, 'need_xp':0, 'max_thirst':20 },

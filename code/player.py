@@ -5,6 +5,7 @@ from settings import *
 from math import *
 from game_data import *
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,tool_dic):
         super().__init__(groups)
