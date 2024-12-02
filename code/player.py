@@ -76,7 +76,6 @@ class Player(pygame.sprite.Sprite):
 
     #모래 파기
     def use_shovel(self,t):
-        keys = pygame.key.get_pressed()
         if self.selected_tool == 'Shovel':
             for sand in self.sand_sprites.sprites():
                 if sand.rect.collidepoint(self.target_pos):

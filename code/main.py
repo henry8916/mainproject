@@ -17,6 +17,7 @@ class Game:
         pygame.display.set_caption('Holes')
         self.clock = pygame.time.Clock()
         self.running = True
+        self.key_down_time=0
 
         # tool
         self.player_tools={
@@ -154,6 +155,7 @@ class Game:
                 if event.type == pygame.KEYUP and event.key == pygame.K_o:
                     self.t = pygame.time.get_ticks()-self.key_down_time# O 키를 뗐을 때 초기화
                     self.player.use_shovel(self.t)
+                    self.key_down_time=0
 
 
                 self.player.mousedbuttondown = True if event.type == pygame.MOUSEBUTTONDOWN else False
@@ -177,7 +179,15 @@ class Game:
             # overlays
             #if self.dialog_tree: self.dialog_tree.update()s
             if self.index_open: self.tool_index.update(dt)
-
+            if self.key_down_time:
+                draw_bar(
+                surface=self.display_surface,
+                rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-70)),
+                value=pygame.time.get_ticks()-self.key_down_time,
+                max_value=1000,
+                color=COLORS['white'],
+                bg_color=COLORS['black']
+            )
 
 
             self.tint_screen(dt)
