@@ -1,3 +1,5 @@
+import pygame
+
 from settings import *
 from player import *
 from sprites import *
@@ -92,6 +94,7 @@ class Game:
             CollisionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)),self.collision_sprites)
         #transision
         for obj in tmx_map.get_layer_by_name('Transition'):
+
             # print(obj.properties)
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
 
@@ -153,12 +156,14 @@ class Game:
                     self.player.use_shovel(self.t)
 
 
-            #update
+                self.player.mousedbuttondown = True if event.type == pygame.MOUSEBUTTONDOWN else False
+                self.player.mousedbuttonup = True if event.type == pygame.MOUSEBUTTONUP else False
+                print(self.player.mousedbuttonup, self.player.mousedbuttondown)
+            #updatedb
             if not self.player.gamestop:
                 self.input()
                 self.transition_check()
                 self.all_sprites.update(dt)
-                self.player.update(dt)
 
 
             #draw

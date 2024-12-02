@@ -18,6 +18,10 @@ class Player(pygame.sprite.Sprite):
         self.timedelay = False
         self.gamestop = False
         self.blocked=False
+        self.mousedbuttondown = False
+        self.mousedbuttonup = False
+        self.lastmouse = False
+        self.gunlist = []
 
         #movement
         self.direction = pygame.Vector2(0,0)
@@ -90,8 +94,8 @@ class Player(pygame.sprite.Sprite):
     def running(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LCTRL]:
-            self.speed =400
-        else: self.speed = 200
+            self.speed = 1000
+        else: self.speed = 500
 
     def teleporting(self):
         keys = pygame.key.get_just_pressed()
@@ -104,8 +108,31 @@ class Player(pygame.sprite.Sprite):
             self.hitbox_rect.center += self.direction * 280
             self.rect.center = self.hitbox_rect.center
 
+    def normalattack(self):
+        # dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+        # angle = atan2(dy, dx)
+        # gun = Gun(angle, self.rect.center, self.groups)
+        # gunlist = []
+        if pygame.mouse.get_pressed()[0] and not self.lastmouse:
+            dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+            angle = atan2(dy, dx)
+            gun = Gun(angle, self.rect.center, self.groups)
+            self.gunlist = [gun]
+        elif pygame.mouse.get_pressed()[0]:
+            print('dd')
+            dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+            angle = atan2(dy, dx)
+            if self.gunlist:
+                self.gunlist[0].changingeangle(angle, self.rect.center)
+        elif not pygame.mouse.get_pressed()[0] and self.lastmouse:
+            dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+            angle = atan2(dy, dx)
+            Bullet(angle, self.rect.center, self.groups)
+            if self.gunlist:
+                self.gunlist[0].kill()
+        self.lastmouse = pygame.mouse.get_pressed()[0]
     def specialattack(self):
-        if pygame.key.get_just_pressed()[pygame.K_SPACE]:
+        if pygame.key.get_just_pressed()[pygame.K_l]:
             for i in range(41):
                 radius = 200
                 angle = 2*i*pi/20
@@ -152,7 +179,39 @@ class Player(pygame.sprite.Sprite):
             self.teleporting()
             self.specialattack()
             self.specialattack2()
-#
+            self.normalattack()
+class Gun(pygame.sprite.Sprite):
+    def __init__(self, angle, pos, groups):
+        super().__init__(groups)
+        self.rect_width = 300
+        self.rect_height = 60
+        self.overlay = pygame.Surface((self.rect_width, self.rect_height), pygame.SRCALPHA)
+    # def draw(self):
+        pygame.draw.rect(self.overlay, (255,0,0,40), (0, 0, self.rect_width, self.rect_height))
+        rotated_surface = pygame.transform.rotate(self.overlay, -degrees(angle))
+        rotated_rect = rotated_surface.get_frect(center=(pos[0]+150*cos(angle), pos[1]+150*sin(angle)))
+        self.image = rotated_surface
+        self.rect = rotated_rect
+    def changingeangle(self,ang,pos):
+        newrotated_surface = pygame.transform.rotate(self.overlay, -degrees(ang))
+        newrotated_rect = newrotated_surface.get_frect(center=(pos[0]+150*cos(ang), pos[1]+150*sin(ang)))
+        self.image = newrotated_surface
+        self.rect = newrotated_rect
+        print('d')
+    def update(self, dt):
+        pass
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, angle, pos, groups):
+        super().__init__(groups)
+        self.image = pygame.image.load('images/gun/bullet.png')
+        self.rect = self.image.get_frect(center = pos)
+        self.angle = angle
+        self.move = pygame.Vector2(cos(angle), sin(angle))
+        self.speed = 500
+    def update(self,dt):
+        self.rect.center += self.move * self.speed * dt
+
+
 class PlayerClone(pygame.sprite.Sprite):
     def __init__(self, pos ,surf, groups,start, life):
         super().__init__(groups)
