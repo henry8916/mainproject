@@ -122,24 +122,6 @@ class Player(pygame.sprite.Sprite):
         # gun = Gun(angle, self.rect.center, self.groups)
         # gunlist = []
 
-
-        # if pygame.mouse.get_pressed()[0] and not self.lastmouse:
-        #     dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
-        #     angle = atan2(dy, dx)
-        #     gun = Gun(angle, self.rect.center, self.groups)
-        #     self.gunlist = [gun]
-        # elif pygame.mouse.get_pressed()[0]:
-        #     dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
-        #     angle = atan2(dy, dx)
-        #     if self.gunlist:
-        #         self.gunlist[0].changingeangle(angle, self.rect.center)
-        # elif not pygame.mouse.get_pressed()[0] and self.lastmouse:
-        #     dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
-        #     angle = atan2(dy, dx)
-        #     Bullet(angle, self.rect.center, self.groups)
-        #     if self.gunlist:
-        #         self.gunlist[0].kill()
-
         if self.selected_tool != None:
             if pygame.mouse.get_pressed()[0] and not self.lastmouse:
                 dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
@@ -167,7 +149,6 @@ class Player(pygame.sprite.Sprite):
                 if self.gunlist:
                     self.gunlist[0].kill()
             self.lastmouse = pygame.mouse.get_pressed()[0]
-
 
     def specialattack(self):
         if pygame.key.get_just_pressed()[pygame.K_l]:
@@ -221,7 +202,7 @@ class Player(pygame.sprite.Sprite):
 
 
 
-
+#tool classes
 class Gun(pygame.sprite.Sprite):
     def __init__(self, angle, pos, groups):
         super().__init__(groups)
@@ -247,8 +228,6 @@ class Gun(pygame.sprite.Sprite):
         print('d')
     def update(self, dt):
         pass
-
-
 class Shovel(pygame.sprite.Sprite):
     def __init__(self, angle, pos, groups):
         super().__init__(groups)
@@ -270,9 +249,7 @@ class Shovel(pygame.sprite.Sprite):
     def update(self, dt):
         pass
 
-
-
-
+#attack image
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, angle, pos, groups):
         super().__init__(groups)
@@ -286,8 +263,6 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center += self.move * self.speed * dt
         if pygame.time.get_ticks() - self.clock >= 1000:
             self.kill()
-
-
 class ShovelBullet(pygame.sprite.Sprite):
     def __init__(self, angle, pos, groups):
         super().__init__(groups)
@@ -303,11 +278,7 @@ class ShovelBullet(pygame.sprite.Sprite):
             self.kill()
 
 
-
-
-
-
-
+#other
 class PlayerClone(pygame.sprite.Sprite):
     def __init__(self, pos ,surf, groups,start, life):
         super().__init__(groups)
@@ -326,7 +297,6 @@ class PlayerClone(pygame.sprite.Sprite):
         if (pygame.time.get_ticks()-self.clock) > self.start+ self.life:
             self.kill()
         self.setalpha()
-
 
 class PlayerClonespecial(pygame.sprite.Sprite):
     def __init__(self, pos ,surf, groups,start, life, radius, angle):
@@ -388,8 +358,6 @@ class PlayerClonespecial2(pygame.sprite.Sprite):
         if self.position.distance_to(self.rect.center) <= self.radius:
             self.move()
         self.setalpha()
-
-
 
 class Camera(pygame.sprite.Sprite):
     def __init__(self,player,groups):
