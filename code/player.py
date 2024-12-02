@@ -185,7 +185,7 @@ class Gun(pygame.sprite.Sprite):
         self.rect_width = 300
         self.rect_height = 60
         self.overlay = pygame.Surface((self.rect_width, self.rect_height), pygame.SRCALPHA)
-    # def draw(self):
+        self.clock = pygame.time.get_ticks()
         pygame.draw.rect(self.overlay, (255,0,0,40), (0, 0, self.rect_width, self.rect_height))
         rotated_surface = pygame.transform.rotate(self.overlay, -degrees(angle))
         rotated_rect = rotated_surface.get_frect(center=(pos[0]+150*cos(angle), pos[1]+150*sin(angle)))
@@ -207,8 +207,12 @@ class Bullet(pygame.sprite.Sprite):
         self.angle = angle
         self.move = pygame.Vector2(cos(angle), sin(angle))
         self.speed = 500
+        self.clock = pygame.time.get_ticks()
+
     def update(self,dt):
         self.rect.center += self.move * self.speed * dt
+        if pygame.time.get_ticks() - self.clock >= 1200:
+            self.kill()
 
 
 class PlayerClone(pygame.sprite.Sprite):
