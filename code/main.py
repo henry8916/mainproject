@@ -53,7 +53,7 @@ class Game:
 
         #overlay
         self.tool_index=ToolIndex(self.player_tools,self.fonts,self.tool_Frames)
-        self.player_index=PlayerIndex(self.player,self.fonts)
+        self.player_index=PlayerIndex(self.player,self.fonts,pygame.image.load(join('images','player','down','0.png')))
         self.index_open=False
         self.index_open1=False
 
@@ -68,7 +68,7 @@ class Game:
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
             'small':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),14),
             'bold':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),40),
-            'explain': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 25)
+            'explain': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 25),
         }
 
 

@@ -214,10 +214,11 @@ class Player(pygame.sprite.Sprite):
 
 
 class PlayerIndex:
-    def __init__(self,player,fonts):
+    def __init__(self,player,fonts,image):
         self.display_surface=pygame.display.get_surface()
         self.fonts=fonts
         self.player=player
+        self.image=image
 
         #frames
         #이미지 처러 혹시 필요하면 함수에서 입력받아 사용하기
@@ -239,24 +240,38 @@ class PlayerIndex:
         topleft_rect = pygame.FRect(rect.topleft,(rect.width*0.4,rect.height*0.4))
         pygame.draw.rect(self.display_surface, COLORS['red'],topleft_rect,0,0,12,0)
 
-        topright_rect=pygame.FRect(self.main_rect.left + rect.width*0.4, self.main_rect.top,self.main_rect.width - rect.width*0.4, self.main_rect.height*0.4)
+        topright_rect=pygame.FRect(self.main_rect.left + rect.width*0.4, self.main_rect.top,self.main_rect.width - rect.width*0.4, self.main_rect.height*0.15)
         pygame.draw.rect(self.display_surface, COLORS['gold'], topright_rect, 0, 0, 0, 12)
+
+        topright2_rect = pygame.FRect(self.main_rect.left + rect.width * 0.4, self.main_rect.top+rect.height * 0.15, self.main_rect.width - rect.width * 0.4, self.main_rect.height * 0.25)
+        pygame.draw.rect(self.display_surface, COLORS['water'], topright2_rect)
+
+
 
 
         #사람 이미지
-        # tool_surf =self.tool_frames[tool.name]
-        # tool_rect = tool_surf.get_frect(center = top_rect.center)
-        # self.display_surface.blit(tool_surf,tool_rect)
+        tool_surf =smallerimage2(self.image)
+        tool_rect = tool_surf.get_frect(center = topleft_rect.center)
+        self.display_surface.blit(tool_surf,tool_rect)
 
         #name
-        # name_surf=self.fonts['bold'].render(tool.name,False,COLORS['white'])
-        # name_rect=name_surf.get_frect( topleft= top_rect.topleft+Vector2(10,10) )
-        # self.display_surface.blit(name_surf,name_rect)
+        name_surf=self.fonts['bold'].render('Stanley',False,COLORS['white'])
+        name_rect=name_surf.get_frect( topleft= topright_rect.topleft )
+        self.display_surface.blit(name_surf,name_rect)
         #
-        # #level
-        # level_surf = self.fonts['regular'].render(f'level: {tool.level}/10', False, COLORS['white'])
-        # level_rect = level_surf.get_frect(topleft=top_rect.bottomleft+Vector2(10,-20))
-        # self.display_surface.blit(level_surf, level_rect)
+        ##level
+        level_surf = self.fonts['explain'].render(f'level: {self.player.level}/10', False, COLORS['white'])
+        level_rect = level_surf.get_frect(topleft=topleft_rect.topright+Vector2(10,50))
+        self.display_surface.blit(level_surf, level_rect)
+        #HP
+        hp_surf = self.fonts['explain'].render('HP', False, COLORS['white'])
+        hp_rect = hp_surf.get_frect(topleft=topright2_rect.midleft + Vector2(10,-20))
+        self.display_surface.blit(hp_surf, hp_rect)
+
+        xp_surf = self.fonts['explain'].render('XP', False, COLORS['white'])
+        xp_rect = xp_surf.get_frect(topleft=topright2_rect.midleft + Vector2(10, 20))
+        self.display_surface.blit(xp_surf, xp_rect)
+
         # draw_bar(
         #     surface=self.display_surface,
         #     rect=pygame.FRect(0,0,400,30).move_to(center=top_rect.midbottom+Vector2(-20,20)),
@@ -289,6 +304,8 @@ class PlayerIndex:
         # #쓸 수 없는 아이템
         # if tool.level==0:
         #     self.display_surface.blit(surf,rect.topleft)
+
+
 
 
     def update(self,dt):
