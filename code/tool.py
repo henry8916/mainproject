@@ -55,7 +55,7 @@ class ToolIndex:
         self.item_height =self.main_rect.height/self.visible_items
         self.index=0
         self.selected_index = None
-
+        self.selected_tool =None
 
 
     def input(self):
@@ -66,13 +66,21 @@ class ToolIndex:
             self.index += 1
         if keys[pygame.K_SPACE]:
             if self.selected_index != None:
-                selected_tool = self.tool[self.selected_index]
-                current_tool = self.tool[self.index]
-                self.tool[self.index] = selected_tool
-                self.tool[self.selected_index] = current_tool
-                self.selected_index = None
+                if self.index==self.selected_index:
+                    self.selected_index=None
+                    self.selected_tool = None
+                else:
+                    self.selected_index=self.index
+                    self.selected_tool = self.tool[self.selected_index]
+                    # selected_tool = self.tool[self.selected_index]
+                    # current_tool = self.tool[self.index]
+                    # self.tool[self.index] = selected_tool
+                    # self.tool[self.selected_index] = current_tool
+                    # self.selected_index = None
             else:
                 self.selected_index = self.index
+                self.selected_tool = self.tool[self.selected_index]
+
 
 
     def display_list(self):

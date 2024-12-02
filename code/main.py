@@ -22,7 +22,7 @@ class Game:
         # tool
         self.player_tools={
             0:Tool('Shovel',1),
-            1:Tool('Gun',0),
+            1:Tool('Gun',1),
         }
 
         # groups
@@ -32,7 +32,7 @@ class Game:
         self.collision_sprites = pygame.sprite.Group()
         #멥 변환 발판들 그룹
         self.transition_sprites = pygame.sprite.Group()
-        #땅팔 수 있는 모래들 그룹
+        #땅팔 수 있는 모래들 그룹aa
         self.sand_sprites=AllSprites()
 
 
@@ -52,13 +52,13 @@ class Game:
         self.tool_index=ToolIndex(self.player_tools,self.fonts,self.tool_Frames)
         self.index_open=False
 
+
+
     def import_assets(self):
         self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx'))}
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
-        print(self.tool_Frames['icons'])
-
         self.fonts={
             'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
@@ -100,10 +100,9 @@ class Game:
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
 
 
-
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
-                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites)
+                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.player_tools)
                 self.camera = Camera(self.player,self.all_sprites)
                 # self.gun = Gun(self.player, self.all_sprites)
 
@@ -131,6 +130,7 @@ class Game:
             self.tint_progress += self.tint_speed*dt
             if self.tint_progress>=255:
                 print(self.transition_target)
+                print(self.player.selected_tool)
                 self.setup(self.tmx_maps[self.transition_target[0]],self.transition_target[1],self.transition_target[0])
                 self.tint_mode='untint'
                 self.transition_target=None
@@ -160,7 +160,6 @@ class Game:
 
                 self.player.mousedbuttondown = True if event.type == pygame.MOUSEBUTTONDOWN else False
                 self.player.mousedbuttonup = True if event.type == pygame.MOUSEBUTTONUP else False
-                print(self.player.mousedbuttonup, self.player.mousedbuttondown)
             #updatedb
             if not self.player.gamestop:
                 self.input()
@@ -178,7 +177,9 @@ class Game:
 
             # overlays
             #if self.dialog_tree: self.dialog_tree.update()s
-            if self.index_open: self.tool_index.update(dt)
+            if self.index_open:
+                self.tool_index.update(dt)
+            self.player.get_current_tool(self.tool_index.selected_tool)
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,

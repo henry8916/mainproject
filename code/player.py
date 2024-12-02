@@ -5,7 +5,7 @@ from settings import *
 from math import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self,pos, groups, collision_sprites, sand_sprites):
+    def __init__(self,pos, groups, collision_sprites, sand_sprites,tool_dic):
         super().__init__(groups)
         self.groups = groups
         self.load_images()
@@ -23,15 +23,19 @@ class Player(pygame.sprite.Sprite):
         self.lastmouse = False
         self.gunlist = []
 
+
         #movement
         self.direction = pygame.Vector2(0,0)
         self.speed = 500
         self.collision_sprites = collision_sprites
 
         #tools
+        self.selected_tool = None
         self.tools=['Shovel','Gun']
-        self.tool_index= 0
-        self.selected_tool = self.tools[self.tool_index]
+        self.tool = tool_dic
+        self.tool_index = None
+
+        # self.selected_tool = self.tools[self.tool_index]
         #interaction
         self.sand_sprites=sand_sprites
         self.key_down_time=0 #땅파기 시작
@@ -74,21 +78,25 @@ class Player(pygame.sprite.Sprite):
                     elif self.direction.y < 0:
                         self.hitbox_rect.top = sprite.rect.bottom
 
-    #모래 파기
+    #삽으로 모래파기
     def use_shovel(self,t):
-        if self.selected_tool == 'Shovel':
-            for sand in self.sand_sprites.sprites():
-                if sand.rect.collidepoint(self.target_pos):
-                    if t>=1000:
-                        print('hello')
-                        sand.damage()
-
-
+        if  self.selected_tool !=None:
+            if self.selected_tool.name == 'Shovel':
+                for sand in self.sand_sprites.sprites():
+                    if sand.rect.collidepoint(self.target_pos):
+                        if t>=1000:
+                            print('hello')
+                            sand.damage()
 
 
     def get_target_pos(self):
         self.target_pos= self.rect.center
 
+
+
+    #현재 장비 입력받기
+    def get_current_tool(self,tool):
+        self.selected_tool=tool
 
     def running(self):
         keys = pygame.key.get_pressed()
@@ -106,30 +114,61 @@ class Player(pygame.sprite.Sprite):
             self.timedelay = True
             self.hitbox_rect.center += self.direction * 280
             self.rect.center = self.hitbox_rect.center
-
+    #총 사용
     def normalattack(self):
+
         # dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
         # angle = atan2(dy, dx)
         # gun = Gun(angle, self.rect.center, self.groups)
         # gunlist = []
-        if pygame.mouse.get_pressed()[0] and not self.lastmouse:
-            dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
-            angle = atan2(dy, dx)
-            gun = Gun(angle, self.rect.center, self.groups)
-            self.gunlist = [gun]
-        elif pygame.mouse.get_pressed()[0]:
-            print('dd')
-            dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
-            angle = atan2(dy, dx)
-            if self.gunlist:
-                self.gunlist[0].changingeangle(angle, self.rect.center)
-        elif not pygame.mouse.get_pressed()[0] and self.lastmouse:
-            dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
-            angle = atan2(dy, dx)
-            Bullet(angle, self.rect.center, self.groups)
-            if self.gunlist:
-                self.gunlist[0].kill()
-        self.lastmouse = pygame.mouse.get_pressed()[0]
+
+
+        # if pygame.mouse.get_pressed()[0] and not self.lastmouse:
+        #     dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+        #     angle = atan2(dy, dx)
+        #     gun = Gun(angle, self.rect.center, self.groups)
+        #     self.gunlist = [gun]
+        # elif pygame.mouse.get_pressed()[0]:
+        #     dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+        #     angle = atan2(dy, dx)
+        #     if self.gunlist:
+        #         self.gunlist[0].changingeangle(angle, self.rect.center)
+        # elif not pygame.mouse.get_pressed()[0] and self.lastmouse:
+        #     dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+        #     angle = atan2(dy, dx)
+        #     Bullet(angle, self.rect.center, self.groups)
+        #     if self.gunlist:
+        #         self.gunlist[0].kill()
+
+        if self.selected_tool != None:
+            if pygame.mouse.get_pressed()[0] and not self.lastmouse:
+                dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+                angle = atan2(dy, dx)
+
+                if self.selected_tool.name == 'Shovel':
+                    shovel = Shovel(angle, self.rect.center, self.groups)
+                    self.gunlist = [shovel]
+                elif self.selected_tool.name == 'Gun':
+                    gun = Gun(angle, self.rect.center, self.groups)
+                    self.gunlist = [gun]
+            elif pygame.mouse.get_pressed()[0]:
+                dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+                angle = atan2(dy, dx)
+                if self.gunlist:
+                    self.gunlist[0].changingeangle(angle, self.rect.center)
+            elif not pygame.mouse.get_pressed()[0] and self.lastmouse:
+                dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
+                angle = atan2(dy, dx)
+                if self.selected_tool.name == 'Shovel':
+                    ShovelBullet(angle, self.rect.center, self.groups)
+                elif self.selected_tool.name == 'Gun':
+                    Bullet(angle, self.rect.center, self.groups)
+
+                if self.gunlist:
+                    self.gunlist[0].kill()
+            self.lastmouse = pygame.mouse.get_pressed()[0]
+
+
     def specialattack(self):
         if pygame.key.get_just_pressed()[pygame.K_l]:
             for i in range(41):
@@ -179,40 +218,94 @@ class Player(pygame.sprite.Sprite):
             self.specialattack()
             self.specialattack2()
             self.normalattack()
+
+
+
+
 class Gun(pygame.sprite.Sprite):
     def __init__(self, angle, pos, groups):
         super().__init__(groups)
         self.rect_width = 300
-        self.rect_height = 60
+        self.rect_height = 50
         self.overlay = pygame.Surface((self.rect_width, self.rect_height), pygame.SRCALPHA)
         self.clock = pygame.time.get_ticks()
         pygame.draw.rect(self.overlay, (255,0,0,40), (0, 0, self.rect_width, self.rect_height))
         rotated_surface = pygame.transform.rotate(self.overlay, -degrees(angle))
-        rotated_rect = rotated_surface.get_frect(center=(pos[0]+150*cos(angle), pos[1]+150*sin(angle)))
+        rotated_rect = rotated_surface.get_frect(center=(pos[0]+150*cos(angle), 40+pos[1]+150*sin(angle)))
         self.image = rotated_surface
         self.rect = rotated_rect
+        self.mousedbuttondown = False
+        self.mousedbuttonup = False
+        self.lastmouse = False
+        self.gunlist = []
+        self.groups=groups
     def changingeangle(self,ang,pos):
         newrotated_surface = pygame.transform.rotate(self.overlay, -degrees(ang))
-        newrotated_rect = newrotated_surface.get_frect(center=(pos[0]+150*cos(ang), pos[1]+150*sin(ang)))
+        newrotated_rect = newrotated_surface.get_frect(center=(pos[0]+150*cos(ang),40+ pos[1]+150*sin(ang)))
         self.image = newrotated_surface
         self.rect = newrotated_rect
         print('d')
     def update(self, dt):
         pass
+
+
+class Shovel(pygame.sprite.Sprite):
+    def __init__(self, angle, pos, groups):
+        super().__init__(groups)
+        self.rect_width = 100
+        self.rect_height = 80
+        self.overlay = pygame.Surface((self.rect_width, self.rect_height), pygame.SRCALPHA)
+        self.clock = pygame.time.get_ticks()
+        pygame.draw.rect(self.overlay, (255,0,0,40), (0, 0, self.rect_width, self.rect_height))
+        rotated_surface = pygame.transform.rotate(self.overlay, -degrees(angle))
+        rotated_rect = rotated_surface.get_frect(center=(pos[0]+50*cos(angle), 40+pos[1]+50*sin(angle)))
+        self.image = rotated_surface
+        self.rect = rotated_rect
+    def changingeangle(self,ang,pos):
+        newrotated_surface = pygame.transform.rotate(self.overlay, -degrees(ang))
+        newrotated_rect = newrotated_surface.get_frect(center=(pos[0]+50*cos(ang),40+ pos[1]+50*sin(ang)))
+        self.image = newrotated_surface
+        self.rect = newrotated_rect
+        print('d')
+    def update(self, dt):
+        pass
+
+
+
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, angle, pos, groups):
         super().__init__(groups)
         self.image = pygame.image.load('images/gun/bullet.png')
-        self.rect = self.image.get_frect(center = pos)
+        self.rect = self.image.get_frect(center = pos+Vector2(0,40))
         self.angle = angle
         self.move = pygame.Vector2(cos(angle), sin(angle))
         self.speed = 1000
         self.clock = pygame.time.get_ticks()
-
     def update(self,dt):
         self.rect.center += self.move * self.speed * dt
-        if pygame.time.get_ticks() - self.clock >= 500:
+        if pygame.time.get_ticks() - self.clock >= 1000:
             self.kill()
+
+
+class ShovelBullet(pygame.sprite.Sprite):
+    def __init__(self, angle, pos, groups):
+        super().__init__(groups)
+        self.image = pygame.image.load('images/gun/bullet.png')
+        self.rect = self.image.get_frect(center=pos+Vector2(0,40))
+        self.angle = angle
+        self.move = pygame.Vector2(cos(angle), sin(angle))
+        self.speed = 1000
+        self.clock = pygame.time.get_ticks()
+    def update(self,dt):
+        self.rect.center += self.move * self.speed * dt
+        if pygame.time.get_ticks() - self.clock >= 100:
+            self.kill()
+
+
+
+
+
 
 
 class PlayerClone(pygame.sprite.Sprite):
