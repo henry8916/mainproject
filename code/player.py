@@ -326,7 +326,6 @@ class Gun(pygame.sprite.Sprite):
         newrotated_rect = newrotated_surface.get_frect(center=(pos[0]+150*cos(ang),40+ pos[1]+150*sin(ang)))
         self.image = newrotated_surface
         self.rect = newrotated_rect
-        print('d')
     def update(self, dt):
         pass
 class Shovel(pygame.sprite.Sprite):
