@@ -206,7 +206,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center = pos)
         self.angle = angle
         self.move = pygame.Vector2(cos(angle), sin(angle))
-        self.speed = 500
+        self.speed = 1000
         self.clock = pygame.time.get_ticks()
 
     def update(self,dt):
