@@ -50,8 +50,9 @@ class Game:
 
         #overlay
         self.tool_index=ToolIndex(self.player_tools,self.fonts,self.tool_Frames)
+        self.player_index=PlayerIndex(self.player,self.fonts)
         self.index_open=False
-
+        self.index_open1=False
 
 
     def import_assets(self):
@@ -111,6 +112,9 @@ class Game:
 
         if pygame.key.get_just_pressed()[pygame.K_RETURN]:
             self.index_open = not self.index_open
+            self.player.blocked=not self.player.blocked
+        if pygame.key.get_just_pressed()[pygame.K_RSHIFT]:
+            self.index_open1= not self.index_open1
             self.player.blocked=not self.player.blocked
 
 
@@ -179,6 +183,8 @@ class Game:
             #if self.dialog_tree: self.dialog_tree.update()s
             if self.index_open:
                 self.tool_index.update(dt)
+            if self.index_open1:
+                self.player_index.update(dt)
             self.player.get_current_tool(self.tool_index.selected_tool)
             if self.key_down_time:
                 draw_bar(

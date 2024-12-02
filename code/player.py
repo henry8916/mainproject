@@ -3,6 +3,7 @@ from pygame import Vector2
 
 from settings import *
 from math import *
+from game_data import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,tool_dic):
@@ -40,6 +41,16 @@ class Player(pygame.sprite.Sprite):
         self.sand_sprites=sand_sprites
         self.key_down_time=0 #땅파기 시작
         self.key_up_time=0 #땅파기 끝
+        self.level = 0
+        self.hp=100
+        self.xp=0
+        self.thirst=10
+
+    #basuc stats
+    def stat_update(self):
+        self.max_hp=STAT_DATA[self.level]['max_hp']
+        self.need_xp=STAT_DATA[self.level]['need_xp']
+        self.max_thirst=STAT_DATA[self.level]['max_thirst']
 
     def load_images(self):
         self.frames = {'left': [], 'right':[] , 'up':[],'down':[]}
@@ -50,7 +61,6 @@ class Player(pygame.sprite.Sprite):
                         full_path = join(folder_path, file_name)
                         surf = smallerimage(pygame.image.load(full_path).convert_alpha())
                         self.frames[state].append(surf)
-
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -87,12 +97,9 @@ class Player(pygame.sprite.Sprite):
                         if t>=1000:
                             print('hello')
                             sand.damage()
-
-
+    #타깃 즉 모래위치
     def get_target_pos(self):
         self.target_pos= self.rect.center
-
-
 
     #현재 장비 입력받기
     def get_current_tool(self,tool):
@@ -103,7 +110,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_LCTRL]:
             self.speed = 1000
         else: self.speed = 500
-
     def teleporting(self):
         keys = pygame.key.get_just_pressed()
         if keys[pygame.K_SPACE]:
@@ -114,7 +120,7 @@ class Player(pygame.sprite.Sprite):
             self.timedelay = True
             self.hitbox_rect.center += self.direction * 280
             self.rect.center = self.hitbox_rect.center
-    #총 사용
+    #일반공격 삽,총
     def normalattack(self):
 
         # dx, dy = pygame.mouse.get_pos()[0] - WINDOW_WIDTH / 2, pygame.mouse.get_pos()[1] - WINDOW_HEIGHT / 2
@@ -149,7 +155,7 @@ class Player(pygame.sprite.Sprite):
                 if self.gunlist:
                     self.gunlist[0].kill()
             self.lastmouse = pygame.mouse.get_pressed()[0]
-
+    #기타 등등
     def specialattack(self):
         if pygame.key.get_just_pressed()[pygame.K_l]:
             for i in range(41):
@@ -158,7 +164,6 @@ class Player(pygame.sprite.Sprite):
                 deltadirection = pygame.Vector2(radius * cos(angle),radius * sin(angle))
                 PlayerClonespecial(self.rect.center + deltadirection , self.image, self.groups, 50*i, 1000, radius , angle)
                 PlayerClonespecial(self.rect.center - deltadirection , self.image, self.groups, 50*i, 1000, radius , pi + angle)
-
     def specialattack2(self):
         if pygame.key.get_just_pressed()[pygame.K_p]:
             for i in range(21):
@@ -166,16 +171,11 @@ class Player(pygame.sprite.Sprite):
                 angle = 2*i*pi/20
                 deltadirection = pygame.Vector2(0,0)
                 PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle)
-
     def block(self):
         self.blocked = True
         self.direction = Vector2(0, 0)
-
     def unblock(self):
         self.blocked = False
-
-
-
     def animate(self,dt):
         #get state
         if self.direction.x != 0:
@@ -186,8 +186,6 @@ class Player(pygame.sprite.Sprite):
         #animate
         self.frame_index = self.frame_index + self.speed//(400//len(self.frames[self.state]))*dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index)%len(self.frames[self.state])]
-
-
     def update(self,dt):
         if not self.blocked:
             self.running()
@@ -199,6 +197,95 @@ class Player(pygame.sprite.Sprite):
             self.specialattack()
             self.specialattack2()
             self.normalattack()
+
+
+class PlayerIndex:
+    def __init__(self,player,fonts):
+        self.display_surface=pygame.display.get_surface()
+        self.fonts=fonts
+        self.player=player
+
+        #frames
+        #이미지 처러 혹시 필요하면 함수에서 입력받아 사용하기
+
+        #tint surf
+        self.tint_surf =pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.tint_surf.set_alpha(200)
+
+        self.main_rect = pygame.FRect(0,0,WINDOW_WIDTH*0.6, WINDOW_HEIGHT*0.8).move_to(center=(WINDOW_WIDTH/2,WINDOW_HEIGHT/2))
+
+    def display_main(self):
+        rect=pygame.FRect(self.main_rect.left ,self.main_rect.top, self.main_rect.width, self.main_rect.height)
+        surf=pygame.Surface((rect.width,rect.height))
+        surf.set_alpha(200)
+        pygame.draw.rect(self.display_surface, COLORS['dark'], rect, 0, 12,12, 12,0)
+
+        #display your image and item image
+        #payer 모습
+        topleft_rect = pygame.FRect(rect.topleft,(rect.width*0.4,rect.height*0.4))
+        pygame.draw.rect(self.display_surface, COLORS['red'],topleft_rect,0,0,12,0)
+
+        topright_rect=pygame.FRect(self.main_rect.left + rect.width*0.4, self.main_rect.top,self.main_rect.width - rect.width*0.4, self.main_rect.height*0.4)
+        pygame.draw.rect(self.display_surface, COLORS['gold'], topright_rect, 0, 0, 0, 12)
+
+
+        #사람 이미지
+        # tool_surf =self.tool_frames[tool.name]
+        # tool_rect = tool_surf.get_frect(center = top_rect.center)
+        # self.display_surface.blit(tool_surf,tool_rect)
+
+        #name
+        # name_surf=self.fonts['bold'].render(tool.name,False,COLORS['white'])
+        # name_rect=name_surf.get_frect( topleft= top_rect.topleft+Vector2(10,10) )
+        # self.display_surface.blit(name_surf,name_rect)
+        #
+        # #level
+        # level_surf = self.fonts['regular'].render(f'level: {tool.level}/10', False, COLORS['white'])
+        # level_rect = level_surf.get_frect(topleft=top_rect.bottomleft+Vector2(10,-20))
+        # self.display_surface.blit(level_surf, level_rect)
+        # draw_bar(
+        #     surface=self.display_surface,
+        #     rect=pygame.FRect(0,0,400,30).move_to(center=top_rect.midbottom+Vector2(-20,20)),
+        #     value=tool.level,
+        #     max_value=10,
+        #     color=COLORS['white'],
+        #     bg_color=COLORS['black']
+        # )
+        # level1_surf = self.fonts['regular'].render(f'max \nlevel', False, COLORS['gold'])
+        # level1_rect = level1_surf.get_frect(topleft=top_rect.midbottom + Vector2(200, 0))
+        # self.display_surface.blit(level1_surf, level1_rect)
+        #
+        #
+        #
+        #
+        # #ablility and skill
+        # for i in range(len(tool.stat)):
+        #     draw_text_in_box(
+        #         surface=self.display_surface,
+        #         rect=pygame.FRect(0,0,200,40).move_to(midbottom=rect.midbottom+Vector2(0,-40*i-10)),
+        #         bg_color=COLORS['white'],
+        #         txt_surf=self.fonts['regular'].render(f'{tool.stat[i]}', False, COLORS['black']),
+        #         )
+        #
+        #
+        # #how to use
+        # guide_surf = self.fonts['explain'].render(tool.guide, False, COLORS['white'])
+        # guide_rect = level_surf.get_frect(topleft=top_rect.bottomleft + Vector2(0, 80))
+        # self.display_surface.blit(guide_surf, guide_rect)
+        # #쓸 수 없는 아이템
+        # if tool.level==0:
+        #     self.display_surface.blit(surf,rect.topleft)
+
+
+    def update(self,dt):
+        #input
+        self.display_surface.blit(self.tint_surf,(0,0))
+        #tint the main game
+        #display the list
+        self.display_main()
+
+
+
 
 
 

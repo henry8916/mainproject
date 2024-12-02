@@ -34,8 +34,6 @@ TOOL_DATA={
             9: 'Camp Green Lake에서 기본으로 제공하는 삽\n땅을 팔 수 있도록 해주는 도구이다\n아주 강해 보인다',
             10:'Camp Green Lake에서 기본으로 제공하는 삽\n땅을 팔 수 있도록 해주는 도구이다\n엄청나게 강해 보인다 '
 
-
-
         }
     },
     'Gun':{
@@ -68,3 +66,19 @@ TOOL_DATA={
         }
     }
 }
+
+STAT_DATA={
+            0:{'max_hp':100, 'need_xp':100, 'max_thirst':10 },
+            1:{'max_hp':120, 'need_xp':0, 'max_thirst':20 },
+            2:{'max_hp':140, 'need_xp':0, 'max_thirst':30},
+            3:{'max_hp':160, 'need_xp':0, 'max_thirst':40},
+            4:{'max_hp':180, 'need_xp':0, 'max_thirst':50},
+            5:{'max_hp':200, 'need_xp':0, 'max_thirst':60},
+            6:{'max_hp':220, 'need_xp':0, 'max_thirst':70},
+            7:{'max_hp':240, 'need_xp':0, 'max_thirst':80},
+            8:{'max_hp':260, 'need_xp':0, 'max_thirst':90},
+            9:{'max_hp':280, 'need_xp':0, 'max_thirst':100},
+            10:{'max_hp':300, 'need_xp':0, 'max_thirst':200}
+}
+
+
