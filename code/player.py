@@ -4,7 +4,7 @@ from pygame import Vector2
 from settings import *
 from math import *
 from game_data import *
-
+from support import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic):
@@ -45,16 +45,18 @@ class Player(pygame.sprite.Sprite):
         self.key_down_time=0 #땅파기 시작
         self.key_up_time=0 #땅파기 끝
         self.level = 0
-        self.hp=100
-        self.xp=0
+        self.hp=90
+        self.xp=25
         self.thirst=10
 
     #basuc stats
     def stat_update(self):
-        self.max_hp=STAT_DATA[self.level]['max_hp']
-        self.need_xp=STAT_DATA[self.level]['need_xp']
+        self.max_hp=STAT_DATA[self.level]['max_hp'] #
+        self.need_xp=STAT_DATA[self.level]['need_xp']#
         self.max_thirst=STAT_DATA[self.level]['max_thirst']
-
+        self.damage=STAT_DATA[self.level]['damage']
+        self.digspeed=STAT_DATA[self.level]['digspeed']
+        self.stat={'damage':self.damage, 'digspeed': self.digspeed}
     def load_images(self):
         self.frames = {'left': [], 'right':[] , 'up':[],'down':[]}
         for state in self.frames.keys():
@@ -211,10 +213,10 @@ class Player(pygame.sprite.Sprite):
             self.specialattack2()
             self.normalattack()
             self.collisionlizard()
-
+            self.stat_update()
 
 class PlayerIndex:
-    def __init__(self,player,fonts,image):
+    def __init__(self,player,fonts,image,tool_frame):
         self.display_surface=pygame.display.get_surface()
         self.fonts=fonts
         self.player=player
@@ -228,6 +230,7 @@ class PlayerIndex:
         self.tint_surf.set_alpha(200)
 
         self.main_rect = pygame.FRect(0,0,WINDOW_WIDTH*0.6, WINDOW_HEIGHT*0.8).move_to(center=(WINDOW_WIDTH/2,WINDOW_HEIGHT/2))
+        self.tool_frame=tool_frame['icons']
 
     def display_main(self):
         rect=pygame.FRect(self.main_rect.left ,self.main_rect.top, self.main_rect.width, self.main_rect.height)
@@ -244,9 +247,7 @@ class PlayerIndex:
         pygame.draw.rect(self.display_surface, COLORS['gold'], topright_rect, 0, 0, 0, 12)
 
         topright2_rect = pygame.FRect(self.main_rect.left + rect.width * 0.4, self.main_rect.top+rect.height * 0.15, self.main_rect.width - rect.width * 0.4, self.main_rect.height * 0.25)
-        pygame.draw.rect(self.display_surface, COLORS['water'], topright2_rect)
-
-
+        pygame.draw.rect(self.display_surface, COLORS['gray'], topright2_rect)
 
 
         #사람 이미지
@@ -258,19 +259,75 @@ class PlayerIndex:
         name_surf=self.fonts['bold'].render('Stanley',False,COLORS['white'])
         name_rect=name_surf.get_frect( topleft= topright_rect.topleft )
         self.display_surface.blit(name_surf,name_rect)
-        #
+
         ##level
         level_surf = self.fonts['explain'].render(f'level: {self.player.level}/10', False, COLORS['white'])
         level_rect = level_surf.get_frect(topleft=topleft_rect.topright+Vector2(10,50))
         self.display_surface.blit(level_surf, level_rect)
+
         #HP
-        hp_surf = self.fonts['explain'].render('HP', False, COLORS['white'])
-        hp_rect = hp_surf.get_frect(topleft=topright2_rect.midleft + Vector2(10,-20))
+        hp_surf = self.fonts['explain'].render(f'HP              {self.player.hp}/{self.player.max_hp}', False, COLORS['white'])
+        hp_rect = hp_surf.get_frect(midleft=topright2_rect.midleft + Vector2(10,-20))
+        self.display_surface.blit(hp_surf, hp_rect)
+        draw_bar(
+            surface=self.display_surface,
+            rect=pygame.FRect(0,0,400,30).move_to(midleft=topright2_rect.midleft + Vector2(10,-20)),
+            value=self.player.hp,
+            max_value= self.player.max_hp,
+            color= COLORS['fire'],
+            bg_color= COLORS['black']
+        )
         self.display_surface.blit(hp_surf, hp_rect)
 
-        xp_surf = self.fonts['explain'].render('XP', False, COLORS['white'])
-        xp_rect = xp_surf.get_frect(topleft=topright2_rect.midleft + Vector2(10, 20))
+
+        #THurst
+        th_surf = self.fonts['explain'].render(f'THURST         {self.player.xp}/{self.player.need_xp}', False, COLORS['white'])
+        th_rect = th_surf.get_frect(midleft=topright2_rect.midleft + Vector2(10, 20))
+        self.display_surface.blit(th_surf, th_rect)
+        draw_bar(
+            surface=self.display_surface,
+            rect=pygame.FRect(0,0,400,30).move_to(midleft=topright2_rect.midleft + Vector2(10, 20)),
+            value=self.player.thirst,
+            max_value=self.player.max_thirst,
+            color=COLORS['water'],
+            bg_color=COLORS['black']
+        )
+        self.display_surface.blit(th_surf, th_rect)
+
+        #XP
+        xp_surf = self.fonts['explain'].render(f'XP             {self.player.xp}/{self.player.need_xp}', False, COLORS['white'])
+        xp_rect = xp_surf.get_frect(midtop=self.main_rect.midbottom + Vector2(0,-self.main_rect.height*0.6+20))
         self.display_surface.blit(xp_surf, xp_rect)
+        draw_bar(
+            surface=self.display_surface,
+            rect=pygame.FRect(0, 0, 700, 30).move_to( midtop=self.main_rect.midbottom + Vector2(0, -self.main_rect.height*0.6+20)),
+            value=self.player.xp,
+            max_value=self.player.need_xp,
+            color=COLORS['gold'],
+            bg_color=COLORS['black']
+        )
+        self.display_surface.blit(xp_surf, xp_rect)
+
+        #stat
+        i=0
+        for k,v in self.player.stat.items():
+            i+=1
+            draw_text_in_box(
+                surface=self.display_surface,
+                rect=pygame.FRect(0,0,200,40).move_to(midleft=self.main_rect.midleft+Vector2(50,80*i)),
+                bg_color=COLORS['white'],
+                txt_surf=self.fonts['regular'].render(f'{k}         {v}', False, COLORS['black']),
+                )
+
+        #tool
+        for i in range(0,len(self.player.tool)):
+            tool_surf = smallerimage2(self.tool_frame[self.player.tool[i].name])
+            tool_rect = tool_surf.get_frect(midright=self.main_rect.midright+Vector2(-300,80*(i+1)))
+            name_surf = self.fonts['explain'].render(f'{self.player.tool[i].name}\nlevel:{self.player.tool[i].level}/10', False, COLORS['white'])
+            name_rect = name_surf.get_frect(midright=self.main_rect.midright+Vector2(-100,80*(i+1)))
+            self.display_surface.blit(tool_surf, tool_rect)
+            self.display_surface.blit(name_surf,name_rect)
+
 
         # draw_bar(
         #     surface=self.display_surface,

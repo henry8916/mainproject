@@ -53,7 +53,7 @@ class Game:
 
         #overlay
         self.tool_index=ToolIndex(self.player_tools,self.fonts,self.tool_Frames)
-        self.player_index=PlayerIndex(self.player,self.fonts,pygame.image.load(join('images','player','down','0.png')))
+        self.player_index=PlayerIndex(self.player,self.fonts,pygame.image.load(join('images','player','down','0.png')),self.tool_Frames)
         self.index_open=False
         self.index_open1=False
 
@@ -75,11 +75,9 @@ class Game:
         #sprites
     def setup(self, tmx_map, player_start_pos,map):
 
-
         #map clear
         for group in (self.all_sprites, self.collision_sprites, self.transition_sprites):
             group.empty()
-
 
         for obj in tmx_map.get_layer_by_name('Objects'):
             CollisionSprite((obj.x*2, obj.y*2),doublingimage(obj.image),(self.all_sprites, self.collision_sprites))

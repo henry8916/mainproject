@@ -98,7 +98,7 @@ class ToolIndex:
             text_surf=self.fonts['regular'].render(tool.name,False,text_color)
             text_rect=text_surf.get_frect(midleft=item_rect.midleft+Vector2(130,0))
 
-            icon_surf=self.icon_frames[tool.name]
+            icon_surf=smallerimage2(self.icon_frames[tool.name])
             icon_rect=icon_surf.get_frect(center=item_rect.midleft+Vector2(50,0))
 
             if item_rect.colliderect(self.main_rect):

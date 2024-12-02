@@ -69,17 +69,17 @@ TOOL_DATA={
 
 
 STAT_DATA={
-            0:{'max_hp':100, 'need_xp':100, 'max_thirst':10 },
-            1:{'max_hp':120, 'need_xp':0, 'max_thirst':20 },
-            2:{'max_hp':140, 'need_xp':0, 'max_thirst':30},
-            3:{'max_hp':160, 'need_xp':0, 'max_thirst':40},
-            4:{'max_hp':180, 'need_xp':0, 'max_thirst':50},
-            5:{'max_hp':200, 'need_xp':0, 'max_thirst':60},
-            6:{'max_hp':220, 'need_xp':0, 'max_thirst':70},
-            7:{'max_hp':240, 'need_xp':0, 'max_thirst':80},
-            8:{'max_hp':260, 'need_xp':0, 'max_thirst':90},
-            9:{'max_hp':280, 'need_xp':0, 'max_thirst':100},
-            10:{'max_hp':300, 'need_xp':0, 'max_thirst':200}
+            0:{'max_hp':100, 'need_xp':100, 'max_thirst':10, 'damage':1, 'digspeed':1},
+            1:{'max_hp':120, 'need_xp':0, 'max_thirst':20, 'damage':2,'digspeed':2},
+            2:{'max_hp':140, 'need_xp':0, 'max_thirst':30,'damage':3,'digspeed':3},
+            3:{'max_hp':160, 'need_xp':0, 'max_thirst':40,'damage':4,'digspeed':4},
+            4:{'max_hp':180, 'need_xp':0, 'max_thirst':50,'damage':5,'digspeed':5},
+            5:{'max_hp':200, 'need_xp':0, 'max_thirst':60,'damage':6,'digspeed':6},
+            6:{'max_hp':220, 'need_xp':0, 'max_thirst':70,'damage':7,'digspeed':7},
+            7:{'max_hp':240, 'need_xp':0, 'max_thirst':80,'damage':8,'digspeed':8},
+            8:{'max_hp':260, 'need_xp':0, 'max_thirst':90,'damage':9,'digspeed':9},
+            9:{'max_hp':280, 'need_xp':0, 'max_thirst':100,'damage':10,'digspeed':10},
+            10:{'max_hp':300, 'need_xp':0, 'max_thirst':200,'damage':20,'digspeed':20}
 }
 
 
