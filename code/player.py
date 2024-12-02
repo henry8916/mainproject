@@ -98,7 +98,7 @@ class Player(pygame.sprite.Sprite):
 
     def teleporting(self):
         keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_LSHIFT]:
+        if keys[pygame.K_SPACE]:
             for i in range(10):
                 PlayerClone(self.rect.center+self.direction*40*i, self.image, self.groups, i*50, 150)
             # self.rect.centerx += (int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT]))*10
@@ -211,7 +211,7 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self,dt):
         self.rect.center += self.move * self.speed * dt
-        if pygame.time.get_ticks() - self.clock >= 1200:
+        if pygame.time.get_ticks() - self.clock >= 500:
             self.kill()
 
 
