@@ -39,6 +39,7 @@ class Game:
         self.sand_sprites=AllSprites()
 
 
+
         # transition/tint
         self.transition_target = None
         self.tint_surf = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))

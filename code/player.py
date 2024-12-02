@@ -319,6 +319,7 @@ class PlayerIndex:
                 txt_surf=self.fonts['regular'].render(f'{k}         {v}', False, COLORS['black']),
                 )
 
+
         #tool
         for i in range(0,len(self.player.tool)):
             tool_surf = smallerimage2(self.tool_frame[self.player.tool[i].name])
