@@ -109,6 +109,7 @@ class Game:
             for obj in tmx_map.get_layer_by_name('Train'):
                 TrainStripe((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.train_sprites)
 
+
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
                 self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools)
@@ -120,9 +121,7 @@ class Game:
                 print('hello')
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player)
             if obj.name == 'Character' and obj.properties['character_id']=='lizard':
-               pass
-
-
+                self.warden = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     def input(self):
