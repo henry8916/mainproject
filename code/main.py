@@ -114,10 +114,13 @@ class Game:
                 self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools)
                 self.camera = Camera(self.player,self.all_sprites)
                 # self.gun = Gun(self.player, self.all_sprites)
-            if obj.name == 'Character':
+            if obj.name == 'Character' and obj.properties['character_id']=='warden':
+                print(obj.properties)
                 print('hello')
                 print('hello')
-                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites)
+                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player)
+            if obj.name == 'Character' and obj.properties['character_id']=='lizard':
+               pass
 
 
 

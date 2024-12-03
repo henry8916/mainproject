@@ -631,3 +631,6 @@ class Camera(pygame.sprite.Sprite):
     def update(self,dt):
         if not self.player.timedelay:
             self.pos = self.player.rect.center
+
+
+
