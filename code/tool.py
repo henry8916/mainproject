@@ -340,6 +340,7 @@ class TrainingIndex:
     #     self.display_surface.blit(shadow_surf,(self.main_rect.left+self.list_width-4,self.main_rect.top))
 
 
+
     # def display_main1(self):
     #     rect = pygame.FRect(self.main_rect.left, self.main_rect.top, self.main_rect.width, self.main_rect.height)
     #     surf = pygame.Surface((rect.width, rect.height))
