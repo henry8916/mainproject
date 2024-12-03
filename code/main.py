@@ -45,6 +45,8 @@ class Game:
         self.sand_sprites=pygame.sprite.Group()
         #숍이나 트레이닝센터 그룹
         self.train_sprites=pygame.sprite.Group()
+        #도마뱀
+        self.giant=None
         self.dialog_tree = None
 
 
@@ -68,6 +70,7 @@ class Game:
         self.index_open=False
         self.index_open1=False
         self.index_open2=False
+        self.clockforgiant = pygame.time.get_ticks()
 
 
     def import_assets(self):
@@ -135,7 +138,7 @@ class Game:
                 print(obj.properties)
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player)
             if obj.name == 'Character' and obj.properties['character_id']=='lizard':
-                self.warden = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
+                self.giant = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
@@ -144,7 +147,6 @@ class Game:
 
         if not sprites:
             if pygame.key.get_just_pressed()[pygame.K_RETURN]:
-                print("hi")
                 self.index_open = not self.index_open
                 self.player.blocked = not self.player.blocked
             if pygame.key.get_just_pressed()[pygame.K_RSHIFT]:
@@ -169,12 +171,7 @@ class Game:
                         self.player.block()
                         character.change_facing_direction(self.player.rect.center)
                         self.create_dialog(character)
-            if pygame.key.get_just_pressed()[pygame.K_RETURN]:
-                self.index_open = not self.index_open
-                self.player.blocked = not self.player.blocked
-            if pygame.key.get_just_pressed()[pygame.K_RSHIFT]:
-                self.index_open1 = not self.index_open1
-                self.player.blocked = not self.player.blocked
+
 
     def create_dialog(self, character):
         if not self.dialog_tree:
@@ -319,17 +316,24 @@ class Game:
 
             self.player.get_current_tool(self.tool_index.selected_tool)
             self.player_index.get_player(self.player)
-
-
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,
-                rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-70)),
+                rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-90)),
                 value=pygame.time.get_ticks()-self.key_down_time,
                 max_value=1000,
                 color=COLORS['white'],
                 bg_color=COLORS['black']
             )
+            draw_bar(
+            surface=self.display_surface,
+            rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-70)),
+            value=self.player.hp,
+            max_value=self.player.max_hp,
+            color=COLORS['red'],
+            bg_color=COLORS['white'] )
+
+
 
             if self.dialog_tree: self.dialog_tree.update()
 
@@ -355,7 +359,22 @@ class Game:
                 title_text1 = title_font.render("모르는게 있을 때에는 항상 제로에게 가도록.", True, COLORS['black'])
                 self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 620))
             self.tint_screen(dt)
+            if self.giant:
+                if self.giant.get_live():
+
+                    self.setup(self.tmx_maps['world'],'tent','world')
+                    talk_rect = pygame.FRect(0, 0, WINDOW_WIDTH* 0.6, WINDOW_HEIGHT * 0.3).move_to(center=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT * 0.7))
+                    # while pygame.time.get_ticks() - self.clockforgiant <500:
+                    #     surf = self.fonts['explain'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black'])
+                    #     rect = surf.get_frect(center=talk_rect.center)
+                    #     pygame.draw.rect(self.display_surface,COLORS['black'],talk_rect)
+                    #     self.display_surface.blit(surf, rect)
+                    #     pygame.display.update()
+                    draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
+
             pygame.display.update()
+            while pygame.time.get_ticks() - self.clockforgiant < 500:
+                pass
 
 
 
