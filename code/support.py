@@ -48,7 +48,32 @@ def import_tilemap(cols, rows, *path):
 			cutout_surf.blit(surf, (0,0), cutout_rect)
 			frames[(col, row)] = cutout_surf
 	return frames
+def character_importer(cols, rows, *path):
+	frame_dict = import_tilemap(cols, rows, *path)
+	new_dict = {}
+	for row, direction in enumerate(('down', 'left', 'right', 'up')):
+		new_dict[direction] = [frame_dict[(col, row)] for col in range(cols)]
+		new_dict[f'{direction}_idle'] = [frame_dict[(0, row)]]
+	return new_dict
 
+def all_character_import(*path):
+	new_dict = {}
+	for _, __, image_names in walk(join(*path)):
+		print(image_names)
+		for image in image_names:
+			image_name = image.split('.')[0]
+			new_dict[image_name] = character_importer(1,4,*path, image_name)
+			print(new_dict)
+	return new_dict
+def check_connection(radius, entity, target, tolerance=30):
+	relation = pygame.Vector2(target.rect.center)-pygame.Vector2(entity.rect.center)
+	if relation.length() < radius:
+		return True
+		# if entity.facing_direction=='left' and relation.x<0 and abs(relation.y)<tolerance or\
+		# 	entity.facing_direction=='right' and relation.x>0 and abs(relation.y)<tolerance or\
+		# 	entity.facing_direction=='up' and relation.y<0 and abs(relation.x)<tolerance or\
+		# 	entity.facing_direction=='down' and relation.y>0 and abs(relation.x)<tolerance:
+		# 	return True
 
 
 #xp 진행 정도 나타내기 player상태창에 이용

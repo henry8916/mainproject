@@ -5,7 +5,64 @@ from settings import *
 from math import *
 from game_data import *
 from support import *
+class Entity(pygame.sprite.Sprite):
+    def __init__(self,pos,frames,groups,facing_direction):
+        super().__init__(groups)
 
+        #graphics
+        self.frame_index,self.frames =0, frames
+        self.facing_direction =facing_direction
+        #sprite setup
+        self.direction=pygame.Vector2()
+        self.speed=250
+        self.blocked=False
+        self.pos=pos
+        self.image = self.frames[self.get_state()][self.frame_index]
+        self.rect=self.image.get_frect(center=pos)
+    def animate(self,dt):
+        self.frame_index+=ANIMATION_SPEED *dt
+        self.image = self.frames[self.get_state()][int(self.frame_index%len(self.frames[self.get_state()]))]
+        self.image = rescaleimage(self.image, 500, 120)
+        self.rect=self.image.get_frect(center=self.pos)
+    def update(self,dt):
+        self.animate(dt)
+    def get_state(self):
+        moving=bool(self.direction)
+        if moving:
+            if self.direction.x!=0:
+                self.facing_direction='right' if self.direction.x>0 else 'left'
+            if self.direction.y!=0:
+                self.facing_direction='down' if self.direction.x>0 else 'up'
+        return f"{self.facing_direction}{''if moving else '_idle'}"
+
+    def change_facing_direction(self,target_pos):
+        relation = pygame.Vector2(target_pos) - pygame.Vector2(self.rect.center)
+        if abs(relation.y)<30:
+            self.facing_direction = 'right' if relation.x>0 else 'left'
+        else:
+            self.facing_direction = 'down' if relation.y>0 else 'up'
+
+    def block(self):
+        self.blocked=True
+        self.direction=pygame.Vector2(0,0)
+    def unblock(self):
+        self.blocked=False
+
+class Character(Entity):
+    def __init__(self, pos, frames, groups, facing_direction,character_data):
+        super().__init__(pos, frames, groups, facing_direction)
+        self.character_data = character_data
+        # self.facing_direction=facing_direction
+        # movement
+        # self.view_directions = character_data['directions']
+
+
+    def get_dialog(self):
+
+        return self.character_data[1]
+
+    def update(self,dt):
+        self.animate(dt)
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic):
         super().__init__(groups)
