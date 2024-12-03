@@ -24,6 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.mousedbuttonup = False
         self.lastmouse = False
         self.gunlist = []
+        self.ifred = False
 
 
         #movement
@@ -32,6 +33,8 @@ class Player(pygame.sprite.Sprite):
         self.collision_sprites = collision_sprites
         self.attack_sprites = attack_sprites
         self.attackstanley_sprites = attackstanley_sprites
+        self.clock = pygame.time.get_ticks()
+        self.clockforbullet = pygame.time.get_ticks()
 
         #tools
         self.selected_tool = None
@@ -45,13 +48,14 @@ class Player(pygame.sprite.Sprite):
         self.key_down_time=0 #땅파기 시작
         self.key_up_time=0 #땅파기 끝
         self.level = 0
-        self.hp=90
+        self.hp=300
         self.xp=25
         self.thirst=10
 
     #basuc stats
     def stat_update(self):
         self.max_hp=STAT_DATA[self.level]['max_hp'] #
+        self.need_xp=STAT_DATA[self.level]['need_xp']#
         self.need_xp=STAT_DATA[self.level]['need_xp']#
         self.max_thirst=STAT_DATA[self.level]['max_thirst']
         self.damage=STAT_DATA[self.level]['damage']
@@ -155,7 +159,9 @@ class Player(pygame.sprite.Sprite):
                 if self.selected_tool.name == 'Shovel':
                     ShovelBullet(angle, self.rect.center, self.groups)
                 elif self.selected_tool.name == 'Gun':
-                    Bullet(angle, self.rect.center, (self.groups,self.attack_sprites))
+                    if pygame.time.get_ticks() - self.clockforbullet > 500:
+                        Bullet(angle, self.rect.center, (self.groups,self.attack_sprites))
+                        self.clockforbullet = pygame.time.get_ticks()
                 if self.gunlist:
                     self.gunlist[0].kill()
             self.lastmouse = pygame.mouse.get_pressed()[0]
@@ -174,7 +180,10 @@ class Player(pygame.sprite.Sprite):
                 radius = 200
                 angle = 2*i*pi/20
                 deltadirection = pygame.Vector2(0,0)
-                PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle)
+                PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle, self.attackstanley_sprites)
+            for sprite in self.attackstanley_sprites:
+                if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
+                    sprite.kill()
     def block(self):
         self.blocked = True
         self.direction = Vector2(0, 0)
@@ -182,10 +191,11 @@ class Player(pygame.sprite.Sprite):
         self.blocked = False
     def collisionlizard(self):
         for sprite in self.attackstanley_sprites:
-            if sprite.rect.colliderect(self.rect):
+            if sprite.rect.colliderect(self.hitbox_rect):
                 sprite.kill()
                 self.hp-=10
-                self.apply_red_effect()
+                self.ifred = True
+                print(self.hp)
     def animate(self,dt):
         #get state
         if self.direction.x != 0:
@@ -196,11 +206,19 @@ class Player(pygame.sprite.Sprite):
         #animate
         self.frame_index = self.frame_index + self.speed//(400//len(self.frames[self.state]))*dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index)%len(self.frames[self.state])]
-    def apply_red_effect(self):
-        red_surface = pygame.Surface(self.image.get_size(), flags=pygame.SRCALPHA)
-        red_surface.fill((255, 0, 0, 100))
-        self.image.blit(red_surface, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
+        # if self.ifred:
+        #      self.apply_red_effect()
+        #      self.ifred = False
+        # if pygame.time.get_ticks() - self.clock():
 
+    # def apply_red_effect(self):
+    #     # red_surface = pygame.Surface(self.image.get_size(), flags=pygame.SRCALPHA)
+    #     # red_surface.fill((255, 0, 0, 100))
+    #     # self.image.blit(red_surface, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
+    #     self.image.fill((255, 0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+    def checkkill(self):
+        if self.hp < 0:
+            self.kill()
     def update(self,dt):
         if not self.blocked:
             self.running()
@@ -214,6 +232,8 @@ class Player(pygame.sprite.Sprite):
             self.normalattack()
             self.collisionlizard()
             self.stat_update()
+            self.checkkill()
+
 
 class PlayerIndex:
     def __init__(self,player,fonts,image,tool_frame):
@@ -420,7 +440,6 @@ class Shovel(pygame.sprite.Sprite):
         newrotated_rect = newrotated_surface.get_frect(center=(pos[0]+50*cos(ang),40+ pos[1]+50*sin(ang)))
         self.image = newrotated_surface
         self.rect = newrotated_rect
-        print('d')
     def update(self, dt):
         pass
 
@@ -454,53 +473,108 @@ class ShovelBullet(pygame.sprite.Sprite):
 
 
 class Warden(pygame.sprite.Sprite):
-    def __init__(self, pos, groups,attack_sprites, attackstanley_sprites):
+    def __init__(self, pos, groups,attack_sprites, attackstanley_sprites,player):
         super().__init__(groups)
         self.image = rescaleimage(pygame.image.load('images/warden/0.png'),512,256)
         self.rect = self.image.get_frect(center = (1280,1280))
         self.attackstanley_sprites = attackstanley_sprites
         self.attack_sprites = attack_sprites
-        self.clock = pygame.time.get_ticks()
+        self.clockshoot = pygame.time.get_ticks()
+        self.clockfireball = pygame.time.get_ticks()
         self.groups = groups
-        self.hp = 10000
+        self.hp = 100000
         self.angle=0
+        self.clockforfireballlizard = pygame.time.get_ticks()
+        self.player = player
 
     def collisionbullet(self):
         for sprite in self.attack_sprites:
             if sprite.rect.colliderect(self.rect):
                 sprite.kill()
                 self.hp-=2000
+                print(self.hp)
 
     def shootlizard(self):
-        if pygame.time.get_ticks() - self.clock > 500:
-            for i in range(10):
-                angle = 2 * i * pi / 10+self.angle
-                Lizardforshoot(angle, self.rect.center, (self.groups,self.attackstanley_sprites))
-            self.clock = pygame.time.get_ticks()
-            self.angle+=2*i*pi/40
+        if pygame.time.get_ticks() - self.clockshoot > 1500:
+            for i in range(8):
+                angle = 2 * i * pi / 8 +self.angle
+                Lizardforshoot(angle, self.rect.center, (self.groups,self.attackstanley_sprites), self.attack_sprites)
+            self.clockshoot = pygame.time.get_ticks()
+            self.angle+=2*i*pi/32
+    def fireballlizard(self):
+        if pygame.time.get_ticks() - self.clockfireball > 2000:
+            print('d')
+            Lizardforfireball(self.rect.center, self.player, (self.groups , self.attackstanley_sprites ), self.attack_sprites)
+            self.clockfireball = pygame.time.get_ticks()
     def checkdie(self):
         if self.hp<=0: self.kill()
     def update(self, dt):
         self.shootlizard()
         self.collisionbullet()
         self.checkdie()
+        self.fireballlizard()
 
 class Lizardforshoot(pygame.sprite.Sprite):
-    def __init__(self, angle, pos, groups):
+    def __init__(self, angle, pos, groups,attack_sprites):
         super().__init__(groups)
         self.image = rescaleimage(pygame.image.load('images/lizardimage/0.png'),512, 128)
         self.angle = angle
         self.direction = pygame.Vector2(cos(angle), sin(angle))
         self.image = pygame.transform.rotate(self.image, -degrees(angle))
         self.rect = self.image.get_frect(center=(pos[0] + 200 * cos(angle), pos[1] + 200 * sin(angle)))
-        self.speed = 1000
+        self.speed = 500
+        self.attack_sprites = attack_sprites
         self.clock = pygame.time.get_ticks()
     def move(self,dt):
         self.rect.center += self.direction * self.speed * dt
-        if pygame.time.get_ticks() - self.clock >= 1000:
+        if pygame.time.get_ticks() - self.clock >= 3000:
             self.kill()
+    def collisionbullet(self):
+        for sprite in self.attack_sprites:
+            if sprite.rect.colliderect(self.rect):
+                sprite.kill()
+                self.kill()
+
     def update(self,dt):
         self.move(dt)
+        self.collisionbullet()
+
+class Lizardforfireball(pygame.sprite.Sprite):
+    def __init__(self,pos,player,groups,attack_sprites):
+        super().__init__(groups)
+        self.image = rescaleimage(pygame.image.load('images/lizardimage/0.png'), 512, 128)
+        self.angle = 0
+        self.direction = pygame.Vector2(cos(self.angle), sin(self.angle))
+        self.image = pygame.transform.rotate(self.image, -degrees(self.angle))
+        self.rect = self.image.get_frect(center=(pos[0] + 200 * cos(self.angle), pos[1] + 200 * sin(self.angle)))
+        self.speed = 600
+        self.clock = pygame.time.get_ticks()
+        self.clockforchangeangle = pygame.time.get_ticks()
+        self.player = player
+        self.attack_sprites = attack_sprites
+
+    def changingeangle(self):
+        dx, dy = self.rect.centerx - self.player.rect.centerx, self.rect.centery - self.player.rect.centery
+        self.angle = atan2(dy, dx)
+        self.direction = pygame.Vector2(-cos(self.angle), -sin(self.angle))
+        # newrotated_surface = pygame.transform.rotate(self.image, -degrees(ang))
+        # newrotated_rect = newrotated_surface.get_frect(
+        #     center=(self.rect.c + 150 * cos(ang), 40 + pos[1] + 150 * sin(ang)))
+        # self.image = newrotated_surface
+        # self.rect = newrotated_rect
+    def move(self,dt):
+        self.rect.center += self.direction * self.speed * dt
+    def collisionbullet(self):
+        for sprite in self.attack_sprites:
+            if sprite.rect.colliderect(self.rect):
+                sprite.kill()
+                self.kill()
+    def update(self,dt):
+        if pygame.time.get_ticks() - self.clockforchangeangle >= 100:
+            self.changingeangle()
+            self.clockforchangeangle = pygame.time.get_ticks()
+        self.move(dt)
+        self.collisionbullet()
 
 #other
 class PlayerClone(pygame.sprite.Sprite):
@@ -543,6 +617,7 @@ class PlayerClonespecial(pygame.sprite.Sprite):
         self.rect.center += self.direction * self.radius /1000 * 100
 
 
+
     def update(self,dt):
         # self.life = dt * self.radius * 1000
         self.move()
@@ -553,11 +628,12 @@ class PlayerClonespecial(pygame.sprite.Sprite):
         self.setalpha()
 
 class PlayerClonespecial2(pygame.sprite.Sprite):
-    def __init__(self, pos ,surf, groups,start, life, radius, angle):
+    def __init__(self, pos ,surf, groups,start, life, radius, angle, attackstanley_sprites):
         super().__init__(groups)
         self.image = pygame.transform.grayscale(surf)
         self.image.set_alpha(0)
         self.rect = self.image.get_frect(center = pos)
+        self.attackstanley_sprites = attackstanley_sprites
         self.clock = pygame.time.get_ticks()
         self.life = life
         self.start = start
@@ -568,6 +644,10 @@ class PlayerClonespecial2(pygame.sprite.Sprite):
     def setalpha(self):
         if (pygame.time.get_ticks()-self.clock) > self.start:
             self.image.set_alpha(100)
+    def collisionlizard(self):
+        for sprite in self.attackstanley_sprites:
+            if sprite.rect.colliderect(self.rect):
+                sprite.kill()
 
     def move(self):
         if (pygame.time.get_ticks()-self.clock) > 2000 - self.start:
@@ -582,6 +662,7 @@ class PlayerClonespecial2(pygame.sprite.Sprite):
         if self.position.distance_to(self.rect.center) <= self.radius:
             self.move()
         self.setalpha()
+        self.collisionlizard()
 
 class Camera(pygame.sprite.Sprite):
     def __init__(self,player,groups):

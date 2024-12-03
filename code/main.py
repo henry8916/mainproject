@@ -60,7 +60,7 @@ class Game:
 
 
     def import_assets(self):
-        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx'))}
+        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx')), 'battlefield':load_pygame(join('holesmap', 'battlefield.tmx'))}
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
@@ -96,8 +96,9 @@ class Game:
             CollisionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)),self.collision_sprites)
         #transision
         for obj in tmx_map.get_layer_by_name('Transition'):
-            # print(obj.properties)
-            TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
+            print(obj.properties)
+            if obj.properties:
+                TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
 
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
@@ -105,10 +106,12 @@ class Game:
                 self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools)
                 self.camera = Camera(self.player,self.all_sprites)
                 # self.gun = Gun(self.player, self.all_sprites)
-            if obj.name == 'Character':
+            # if obj.properties['character_id'']=='warden':
+            if obj.name == 'Character' and obj.properties['character_id']=='warden':
+                print(obj.properties)
                 print('hello')
                 print('hello')
-                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites)
+                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.player)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     def input(self):
@@ -199,9 +202,9 @@ class Game:
                 bg_color=COLORS['black']
             )
 
-
             self.tint_screen(dt)
             pygame.display.update()
+
 
 
 
