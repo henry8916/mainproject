@@ -28,7 +28,7 @@ class Game:
 
 
         # groups
-        #모든 스프라이트들 그룹
+        #모든 스프라이트들 그룹d
         self.all_sprites = AllSprites()
         #충돌 스트라이프들 그룹
         self.collision_sprites = pygame.sprite.Group()
@@ -40,7 +40,7 @@ class Game:
         #땅팔 수 있는 모래들 그룹
         self.sand_sprites=pygame.sprite.Group()
         #숍이나 트레이닝센터 그룹
-        self.train_sprites=pygame.sprite.Group()
+        self.train_dsprites=pygame.sprite.Group()
 
 
 
@@ -107,7 +107,7 @@ class Game:
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
         if map=='world':
             for obj in tmx_map.get_layer_by_name('Train'):
-                TrainStripe((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.train_sprites)
+                TransitionSprite((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.transition_sprites)
 
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
@@ -119,9 +119,9 @@ class Game:
                 print(obj.properties)
                 print('hello')
                 print('hello')
-                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player)
+                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
             if obj.name == 'Character' and obj.properties['character_id']=='lizard':
-                self.warden = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player)
+                self.warden = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     def input(self):
@@ -133,15 +133,15 @@ class Game:
             self.index_open1= not self.index_open1
             self.player.blocked=not self.player.blocked
 
-    # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
-    def training_check(self):
-        sprites=[sprite for sprite in self.train_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
-        if sprites:
-            self.index_open2=True
-            self.traing_index.place=sprites[0].place
-        else:
-            self.index_open2=False
-
+    # # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
+    # def training_check(self):
+    #     sprites=[sprite for sprite in self.train_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
+    #     if sprites:
+    #         self.index_open2=True
+    #         self.traing_index.place=sprites[0].place
+    #     else:
+    #         self.index_open2=False
+    #
 
 
 
@@ -189,7 +189,7 @@ class Game:
                     self.t = pygame.time.get_ticks()-self.key_down_time# O 키를 뗐을 때 초기화
                     self.player.use_shovel(self.t)
                     self.key_down_time=0
-                    self.player.blocked = False
+                    self.player.blockeds = False
 
                 self.player.mousedbuttondown = True if event.type == pygame.MOUSEBUTTONDOWN else False
                 self.player.mousedbuttonup = True if event.type == pygame.MOUSEBUTTONUP else False
@@ -197,7 +197,8 @@ class Game:
             if not self.player.gamestop:
                 self.input()
                 self.transition_check()
-                self.training_check()
+                # self.trainingaaa_check()
+
                 self.all_sprites.update(dt)
 
 
