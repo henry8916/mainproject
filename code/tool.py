@@ -347,6 +347,7 @@ class TrainingIndex:
     #     surf.set_alpha(200)
     #     pygame.draw.rect(self.display_surface, COLORS['plant'], rect, 0, 12, 12, 12, 0)
 
+
     def display_main2(self):
         rect = pygame.FRect(self.main_rect.left, self.main_rect.top, self.main_rect.width, self.main_rect.height)
         surf = pygame.Surface((rect.width, rect.height))

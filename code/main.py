@@ -12,6 +12,7 @@ class Game:
     def __init__(self):
         #settings
 
+
         pygame.init()
         self.display_surface  = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption('Holes')
@@ -24,6 +25,7 @@ class Game:
             0:Tool('Shovel',1),
             1:Tool('Gun',1),
         }
+
 
         # groups
         #모든 스프라이트들 그룹
