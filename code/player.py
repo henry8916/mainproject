@@ -52,10 +52,10 @@ class Player(pygame.sprite.Sprite):
         self.xp=25
         self.thirst=10
 
+        self.coin=0
     #basuc stats
     def stat_update(self):
         self.max_hp=STAT_DATA[self.level]['max_hp'] #
-        self.need_xp=STAT_DATA[self.level]['need_xp']#
         self.need_xp=STAT_DATA[self.level]['need_xp']#
         self.max_thirst=STAT_DATA[self.level]['max_thirst']
         self.damage=STAT_DATA[self.level]['damage']
@@ -106,6 +106,8 @@ class Player(pygame.sprite.Sprite):
                         if t>=1000:
                             print('hello')
                             sand.damage()
+                            self.coin+=1
+                            print(self.coin)
     #타깃 즉 모래위치
     def get_target_pos(self):
         self.target_pos= self.rect.center
@@ -301,7 +303,7 @@ class PlayerIndex:
 
 
         #THurst
-        th_surf = self.fonts['explain'].render(f'THURST         {self.player.xp}/{self.player.need_xp}', False, COLORS['white'])
+        th_surf = self.fonts['explain'].render(f'THURST         {self.player.thirst}/{self.player.max_thirst}', False, COLORS['white'])
         th_rect = th_surf.get_frect(midleft=topright2_rect.midleft + Vector2(10, 20))
         self.display_surface.blit(th_surf, th_rect)
         draw_bar(
@@ -337,8 +339,14 @@ class PlayerIndex:
                 rect=pygame.FRect(0,0,200,40).move_to(midleft=self.main_rect.midleft+Vector2(50,80*i)),
                 bg_color=COLORS['white'],
                 txt_surf=self.fonts['regular'].render(f'{k}         {v}', False, COLORS['black']),
-                )
+                radius=12)
 
+        draw_text_in_box(
+            surface=self.display_surface,
+            rect=pygame.FRect(0, 0, 200, 40).move_to(midright= topright_rect.midright+Vector2(-50,0)),
+            bg_color=COLORS['white'],
+            txt_surf=self.fonts['explain'].render(f'coin:   {self.player.coin}', False, COLORS['black']),
+            radius=12)
 
         #tool
         for i in range(0,len(self.player.tool)):
@@ -348,6 +356,8 @@ class PlayerIndex:
             name_rect = name_surf.get_frect(midright=self.main_rect.midright+Vector2(-100,80*(i+1)))
             self.display_surface.blit(tool_surf, tool_rect)
             self.display_surface.blit(name_surf,name_rect)
+    def get_player(self,player):
+        self.player=player
 
     def update(self,dt):
         #input

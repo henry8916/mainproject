@@ -28,7 +28,7 @@ class Game:
 
 
         # groups
-        #모든 스프라이트들 그룹d
+        #모든 스프라이트들 그룹
         self.all_sprites = AllSprites()
         #충돌 스트라이프들 그룹
         self.collision_sprites = pygame.sprite.Group()
@@ -40,7 +40,7 @@ class Game:
         #땅팔 수 있는 모래들 그룹
         self.sand_sprites=pygame.sprite.Group()
         #숍이나 트레이닝센터 그룹
-        self.train_dsprites=pygame.sprite.Group()
+        self.train_sprites=pygame.sprite.Group()
 
 
 
@@ -70,7 +70,7 @@ class Game:
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
-        self.item_Frames={'HP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'XP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'THIRST_potion':pygame.image.load(join('icons','shovel-removebg-preview.png'))}
+        self.item_Frames={'HP_potion':pygame.image.load('images/items/healthpo.png'),'XP_potion':pygame.image.load('images/items/bluepo.png'),'THIRST_potion':pygame.image.load('images/items/waterbottle.png')}
         self.fonts={
             'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
@@ -107,7 +107,7 @@ class Game:
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
         if map=='world':
             for obj in tmx_map.get_layer_by_name('Train'):
-                TransitionSprite((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.transition_sprites)
+                TrainStripe((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.train_sprites)
 
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
@@ -124,24 +124,32 @@ class Game:
                 self.warden = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
+    # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
     def input(self):
+        sprites = [sprite for sprite in self.train_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
 
-        if pygame.key.get_just_pressed()[pygame.K_RETURN]:
-            self.index_open = not self.index_open
-            self.player.blocked=not self.player.blocked
-        if pygame.key.get_just_pressed()[pygame.K_RSHIFT]:
-            self.index_open1= not self.index_open1
-            self.player.blocked=not self.player.blocked
+        if not sprites:
+            if pygame.key.get_just_pressed()[pygame.K_RETURN]:
+                self.index_open = not self.index_open
+                self.player.blocked=not self.player.blocked
+            if pygame.key.get_just_pressed()[pygame.K_RSHIFT]:
+                self.index_open1= not self.index_open1
+                self.player.blocked=not self.player.blocked
 
-    # # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
-    # def training_check(self):
-    #     sprites=[sprite for sprite in self.train_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
-    #     if sprites:
-    #         self.index_open2=True
-    #         self.traing_index.place=sprites[0].place
-    #     else:
-    #         self.index_open2=False
-    #
+        if sprites:
+            self.traing_index.place = sprites[0].place
+            if pygame.key.get_just_pressed()[pygame.K_RSHIFT] and self.traing_index.place == 'Shop':
+                self.index_open2 = not self.index_open2
+                self.player.blocked = not self.player.blocked
+            if pygame.key.get_just_pressed()[pygame.K_RETURN] and self.traing_index.place == 'Training':
+                self.index_open2 = not self.index_open2
+                self.player.blocked = not self.player.blocked
+
+
+
+
+
+
 
 
 
@@ -189,7 +197,11 @@ class Game:
                     self.t = pygame.time.get_ticks()-self.key_down_time# O 키를 뗐을 때 초기화
                     self.player.use_shovel(self.t)
                     self.key_down_time=0
-                    self.player.blockeds = False
+                    self.player.blocked = False
+                if self.index_open2:
+                    self.traing_index.click1(event)
+                    self.traing_index.click2(event)
+
 
                 self.player.mousedbuttondown = True if event.type == pygame.MOUSEBUTTONDOWN else False
                 self.player.mousedbuttonup = True if event.type == pygame.MOUSEBUTTONUP else False
@@ -197,8 +209,6 @@ class Game:
             if not self.player.gamestop:
                 self.input()
                 self.transition_check()
-                # self.trainingaaa_check()
-
                 self.all_sprites.update(dt)
 
 
@@ -220,6 +230,7 @@ class Game:
                 self.traing_index.update()
 
             self.player.get_current_tool(self.tool_index.selected_tool)
+            self.player_index.get_player(self.player)
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,
