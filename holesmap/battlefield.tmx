@@ -53,7 +53,7 @@
   </object>
   <object id="7" name="Character" x="482" y="500">
    <properties>
-    <property name="charecter_id" value="lizard"/>
+    <property name="character_id" value="lizard"/>
     <property name="direction" value="down"/>
    </properties>
    <point/>
