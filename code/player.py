@@ -502,7 +502,7 @@ class Warden(pygame.sprite.Sprite):
         # draw_bar(
         #     surface=self.display_surface,
         #     rect=pygame.FRect(0, 0, 100, 20).move_to(midbottom=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 70)),
-        #     value=pygame.time.get_ticks() - self.key_down_time,
+        #     value=self.player.hp,
         #     max_value=1000,
         #     color=COLORS['white'],
         #     bg_color=COLORS['black']
