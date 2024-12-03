@@ -329,53 +329,12 @@ class PlayerIndex:
             self.display_surface.blit(tool_surf, tool_rect)
             self.display_surface.blit(name_surf,name_rect)
 
-
-        # draw_bar(
-        #     surface=self.display_surface,
-        #     rect=pygame.FRect(0,0,400,30).move_to(center=top_rect.midbottom+Vector2(-20,20)),
-        #     value=tool.level,
-        #     max_value=10,
-        #     color=COLORS['white'],
-        #     bg_color=COLORS['black']
-        # )
-        # level1_surf = self.fonts['regular'].render(f'max \nlevel', False, COLORS['gold'])
-        # level1_rect = level1_surf.get_frect(topleft=top_rect.midbottom + Vector2(200, 0))
-        # self.display_surface.blit(level1_surf, level1_rect)
-        #
-        #
-        #
-        #
-        # #ablility and skill
-        # for i in range(len(tool.stat)):
-        #     draw_text_in_box(
-        #         surface=self.display_surface,
-        #         rect=pygame.FRect(0,0,200,40).move_to(midbottom=rect.midbottom+Vector2(0,-40*i-10)),
-        #         bg_color=COLORS['white'],
-        #         txt_surf=self.fonts['regular'].render(f'{tool.stat[i]}', False, COLORS['black']),
-        #         )
-        #
-        #
-        # #how to use
-        # guide_surf = self.fonts['explain'].render(tool.guide, False, COLORS['white'])
-        # guide_rect = level_surf.get_frect(topleft=top_rect.bottomleft + Vector2(0, 80))
-        # self.display_surface.blit(guide_surf, guide_rect)
-        # #쓸 수 없는 아이템
-        # if tool.level==0:
-        #     self.display_surface.blit(surf,rect.topleft)
-
-
-
-
     def update(self,dt):
         #input
         self.display_surface.blit(self.tint_surf,(0,0))
         #tint the main game
         #display the list
         self.display_main()
-
-
-
-
 
 
 #tool classes

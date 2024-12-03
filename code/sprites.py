@@ -23,6 +23,12 @@ class TransitionSprite(Sprite):
         super().__init__(pos, surf, groups)
         self.target = target
 
+class TrainStripe(Sprite):
+    def __init__(self,pos,surf,place, groups):
+        super().__init__(pos,surf,groups)
+        self.place=place
+
+
 class SandSprite(pygame.sprite.Sprite):
     def __init__(self,pos,surf,groups):
         super().__init__(groups)

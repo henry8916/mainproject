@@ -35,8 +35,10 @@ class Game:
         # 멥 변환 발판들 그룹
         self.attack_sprites = pygame.sprite.Group()
         self.attackstanley_sprites = pygame.sprite.Group()
-        #땅팔 수 있는 모래들 그룹aa
-        self.sand_sprites=AllSprites()
+        #땅팔 수 있는 모래들 그룹
+        self.sand_sprites=pygame.sprite.Group()
+        #숍이나 트레이닝센터 그룹
+        self.train_sprites=pygame.sprite.Group()
 
 
 
@@ -55,8 +57,10 @@ class Game:
         #overlay
         self.tool_index=ToolIndex(self.player_tools,self.fonts,self.tool_Frames)
         self.player_index=PlayerIndex(self.player,self.fonts,pygame.image.load(join('images','player','down','0.png')),self.tool_Frames)
+        self.traing_index=TrainingIndex(self.fonts,self.player,self.player_tools,self.item_Frames,self.tool_Frames['icons'])
         self.index_open=False
         self.index_open1=False
+        self.index_open2=False
 
 
     def import_assets(self):
@@ -64,6 +68,7 @@ class Game:
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
+        self.item_Frames={'HP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'XP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'THIRST_potion':pygame.image.load(join('icons','shovel-removebg-preview.png'))}
         self.fonts={
             'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
@@ -98,7 +103,9 @@ class Game:
         for obj in tmx_map.get_layer_by_name('Transition'):
             # print(obj.properties)
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
-
+        if map=='world':
+            for obj in tmx_map.get_layer_by_name('Train'):
+                TrainStripe((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.train_sprites)
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
@@ -110,6 +117,8 @@ class Game:
                 print('hello')
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites)
 
+
+
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     def input(self):
 
@@ -120,6 +129,17 @@ class Game:
             self.index_open1= not self.index_open1
             self.player.blocked=not self.player.blocked
 
+    # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
+    def training_check(self):
+        sprites=[sprite for sprite in self.train_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
+        if sprites:
+            self.index_open2=True
+            self.traing_index.place=sprites[0].place
+        else:
+            self.index_open2=False
+
+
+
 
     # transition system
     def transition_check(self):
@@ -128,6 +148,8 @@ class Game:
             self.player.block()
             self.transition_target=sprites[0].target
             self.tint_mode='tint'
+
+
 
     def tint_screen(self,dt):
         if  self.tint_mode=='untint':
@@ -171,6 +193,7 @@ class Game:
             if not self.player.gamestop:
                 self.input()
                 self.transition_check()
+                self.training_check()
                 self.all_sprites.update(dt)
 
 
@@ -188,6 +211,9 @@ class Game:
                 self.tool_index.update(dt)
             if self.index_open1:
                 self.player_index.update(dt)
+            if self.index_open2:
+                self.traing_index.update()
+
             self.player.get_current_tool(self.tool_index.selected_tool)
             if self.key_down_time:
                 draw_bar(
