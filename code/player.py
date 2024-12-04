@@ -63,9 +63,6 @@ class Character(Entity):
 
     def update(self,dt):
         self.animate(dt)
-
-
-
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic,playerstat):
         super().__init__(groups)
@@ -584,7 +581,8 @@ class Warden(pygame.sprite.Sprite):
             Lizardforfireball(self.rect.center+pygame.Vector2(-100,0), self.player, (self.groups , self.attackstanley_sprites ), self.attack_sprites)
             self.clockfireball = pygame.time.get_ticks()
     def checkdie(self):
-        if self.hp<=0: self.kill()
+        if self.hp<=0:
+            self.player.endgame = True
     def shootfireball(self):
         if 5000< pygame.time.get_ticks() - self.clockshootfireball < 10000:
             self.clockshoot2 = pygame.time.get_ticks()
@@ -776,7 +774,7 @@ class Giantlizard(pygame.sprite.Sprite):
         self.groups = groups
         self.collision_sprites = collision_sprites
         self.display_surface = display_surface
-        self.hp = 2000
+        self.hp = 20000
         self.angle=0
         self.clockf = pygame.time.get_ticks()
         self.player = player
@@ -972,8 +970,28 @@ class Lizardfireball(pygame.sprite.Sprite):
         else: self.startcheck()
 
 
+class Fireball(pygame.sprite.Sprite):
+    def __init__(self, angle, pos, groups):
+        super().__init__(groups)
+        self.image = pygame.image.load('images/fireball/0.png')
+        self.image = rescaleimage(self.image, 10 ,1)
+        self.rect = self.image.get_frect(center = pos)
+        self.angle = angle
+        self.move = pygame.Vector2(-cos(angle), -sin(angle))
+        self.speed = 1000
+        self.clock = pygame.time.get_ticks()
+        # newrotated_surface = pygame.transform.rotate(self.image, -degrees(ang))
+        # newrotated_rect = newrotated_surface.get_frect(
+        #     center=(self.rect.c + 150 * cos(ang), 40 + pos[1] + 150 * sin(ang)))
+        # self.image = newrotated_surface
+        # self.rect = newrotated_rect
+        self.image = pygame.transform.rotate(self.image, -degrees(self.angle))
+        self.rect = self.image.get_frect(center = pos)
 
-
+    def update(self,dt):
+        self.rect.center += self.move * self.speed * dt
+        if pygame.time.get_ticks() - self.clock >= 3000:
+            self.kill()
 
 
 

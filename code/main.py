@@ -135,11 +135,11 @@ class Game:
                           groups=(self.all_sprites,self.collision_sprites,self.character_sprites),
                           facing_direction = obj.properties['direction'],
                           character_data=PLAYER_DATA[obj.properties['character_id']])
-            if obj.name == 'Character' and obj.properties['character_id']=='warden':
+            if obj.name == 'Character' and obj.properties['character_id']=='warden' and self.player.level>=10:
                 print(obj.properties)
-                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player)
-            if obj.name == 'Character' and obj.properties['character_id']=='lizard':
-                self.warden = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
+                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
+            if obj.name == 'Character' and obj.properties['character_id']=='lizard' and self.player.level>=5:
+                self.giant = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
@@ -193,7 +193,13 @@ class Game:
     # transition system
     def transition_check(self):
         sprites=[sprite for sprite in self.transition_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
-        if sprites:
+        if sprites and (not sprites[0].target[0]=='centerhouse' or self.player.level>=10) and (not sprites[0].target[0]=='battlefield' or self.player.level>=5):
+        # if sprites:
+            print(self.player.level)
+            print(sprites[0].target[0])
+            # 'battlefield'
+            #
+            # 'centerhouse'
             self.player.block()
             self.transition_target=sprites[0].target
             self.tint_mode='tint'
@@ -266,6 +272,28 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 375))
 
             pygame.display.update()
+    def Go(self):
+        while True:
+            for event in pygame.event.get():
+                keys = pygame.key.get_pressed()
+                if event.type==pygame.QUIT:
+                    sys.exit()
+            print('aaa')
+
+
+
+            self.display_surface.fill('black')
+
+            title_font = self.fonts['explain']
+            title_text1 = title_font.render("축하합니다", True, COLORS['pure white'])
+            title_text2 = title_font.render("스탠리는 워든을 무찔렀습니다", True, COLORS['pure white'])
+            title_text3 = title_font.render("보물상자는 많은 보물이 들어있었고 스탠리는 행복하게 살았다고 합니다", True, COLORS['pure white'])
+            self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
+            self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 350))
+            self.display_surface.blit(title_text3, (WINDOW_WIDTH // 2 - title_text3.get_width() // 2, 375))
+            pygame.display.update()
+
+
     def run(self):
         while self.running:
 
@@ -382,8 +410,12 @@ class Game:
                     draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
 
             pygame.display.update()
-            while pygame.time.get_ticks() - self.clockforgiant < 500:
-                pass
+            if self.player.endgame:
+                for group in (self.all_sprites, self.collision_sprites, self.transition_sprites):
+                    group.empty()
+                self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+                self.Go()
 
 
 
