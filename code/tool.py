@@ -7,7 +7,6 @@ from support import *
 #장비 클래스 삽이랑 총 자동차는 모르겠음
 class Tool:
     def __init__(self, name, level):
-        self.locked=True
         self.name,self.level=name,level
         # stats
         self.digspeed=TOOL_DATA[name]['level'][level]['digspeed']
@@ -15,20 +14,16 @@ class Tool:
         self.skill=TOOL_DATA[name]['level'][level]['skill']
         self.stat=[self.plusdamage,self.digspeed,self.skill]
         self.guide=TOOL_DATA[name]['guide'][level]
-
-    def unlock_skill(self):
-        if self.level>=5:
-            self.locked=False
-
-    def tool_level_up(self,name):
-        self.level+=1
-        self.unlock_skill()
+        self.cost=TOOL_DATA[name]['level'][level]['need_coin']
+    def tool_update(self):
         # stats
-        self.digspeed = TOOL_DATA[name]['level'][self.level]['digspeed']
-        self.plusdamage = TOOL_DATA[name]['level'][self.level]['plusdamage']
-        self.skill = TOOL_DATA[name]['level'][self.level]['skill']
-        self.guide = TOOL_DATA[name]['guide'][self.level]
+        self.digspeed = TOOL_DATA[self.name]['level'][self.level]['digspeed']
+        self.plusdamage = TOOL_DATA[self.name]['level'][self.level]['plusdamage']
+        self.skill = TOOL_DATA[self.name]['level'][self.level]['skill']
+        self.guide = TOOL_DATA[self.name]['guide'][self.level]
         self.stat = [self.plusdamage, self.digspeed, self.skill]
+        self.cost = TOOL_DATA[self.name]['level'][self.level]['need_coin']
+
 
 class Item:
     def __init__(self,name):
@@ -303,7 +298,9 @@ class TrainingIndex:
             text_rect = text_surf.get_frect(center=rect.center+Vector2(0,-WINDOW_HEIGHT * 0.1))
             pygame.draw.rect(self.display_surface,COLORS['water'],rect,0,6)
             self.display_surface.blit(text_surf,text_rect)
-
+            text_surf = self.fonts['regular'].render(f'{self.player.coin}/{self.item[tuple(self.selected_index1)].cost} coin', False, COLORS['white'])
+            text_rect = text_surf.get_frect(center=rect.center + Vector2(0, 40-WINDOW_HEIGHT * 0.1))
+            self.display_surface.blit(text_surf, text_rect)
     def click1(self,event):
         if self.selected_index1:
             name = self.item[tuple(self.selected_index1)].name
@@ -321,11 +318,17 @@ class TrainingIndex:
                     self.is_pressed=False
 
                 if name=='HP_potion':
-                    self.player.hp+=50
+                    if self.player.coin>=self.item[tuple(self.selected_index1)].cost:
+                        self.player.hp+=50
+                        self.player.coin-=self.item[tuple(self.selected_index1)].cost
                 elif name=='XP_potion':
-                    self.player.xp+=200
+                    if self.player.coin >= self.item[tuple(self.selected_index1)].cost:
+                        self.player.xp+=200
+                        self.player.coin -= self.item[tuple(self.selected_index1)].cost
                 elif name=='THIRST_potion':
-                    self.player.thirst+=20
+                    if self.player.coin >= self.item[tuple(self.selected_index1)].cost:
+                        self.player.thirst+=20
+                        self.player.coin -= self.item[tuple(self.selected_index1)].cost
                     # 눌린 상태였다면
 
     def button1(self):
@@ -375,6 +378,7 @@ class TrainingIndex:
             icon_rect = icon_surf.get_frect(center=item_rect.midleft + Vector2(50, 0))
 
             if item_rect.colliderect(self.main_rect):
+
 
                 # check corner
 
@@ -441,6 +445,10 @@ class TrainingIndex:
         level_surf = self.fonts['explain'].render(f'level: {tool.level}/10', False, COLORS['white'])
         level_rect = level_surf.get_frect(midtop=top_rect.midbottom + Vector2(0, 60))
         self.display_surface.blit(level_surf, level_rect)
+        print(self.player.coin)
+        coin_surf = self.fonts['explain'].render(f'need {self.player.coin}/{tool.cost}coin', False, COLORS['white'])
+        coin_rect = coin_surf.get_frect(midtop=top_rect.midbottom + Vector2(0, 100))
+        self.display_surface.blit(coin_surf, coin_rect)
 
         # draw_text_in_box(surface=self.display_surface,
         #                  rect=pygame.FRect(0,0,300,80).move_to(midbottom=self.main_rect.midbottom+Vector2(0, -200)),
@@ -449,7 +457,7 @@ class TrainingIndex:
         #                  radius=12)
 
     def click2(self,event):
-
+        tool = self.tool[self.index2]
         upgrade_rect = pygame.FRect(0, 0, 300, 80).move_to(midbottom=self.main_rect.midbottom+Vector2(0, -200))
         bg_rect=upgrade_rect.copy()
         txt_surf = self.fonts['explain'].render(f'UPGRADE', False, COLORS['gold'])
@@ -463,7 +471,11 @@ class TrainingIndex:
         elif event.type == pygame.MOUSEBUTTONUP:
             if self.is_pressed:
                 self.is_pressed=False
-                self.player.tool[self.index2].level+=1
+                if self.player.coin>=tool.cost:
+                    self.player.tool[self.index2].level+=1
+                    self.player.coin -=tool.cost
+                    self.player.tool[self.index2].tool_update()
+
                 # 눌린 상태였다면
 
     def button2(self):

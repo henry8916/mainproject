@@ -25,9 +25,10 @@ class Game:
 
         # tool
         self.player_tools={
-            0:Tool('Shovel',1),
-            1:Tool('Gun',1),
+            0:Tool('Shovel',5),
+            1:Tool('Gun',5),
         }
+        self.player_stat=Characterstat()
 
 
         # groups
@@ -74,13 +75,13 @@ class Game:
 
 
     def import_assets(self):
-        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx')), 'battlefield':load_pygame(join('holesmap','battlefield.tmx'))}
+        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx')), 'battlefield':load_pygame(join('holesmap','battlefield.tmx')), 'room':load_pygame(join('holesmap','room.tmx'))}
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
         self.item_Frames={'HP_potion':pygame.image.load('images/items/healthpo.png'),'XP_potion':pygame.image.load('images/items/bluepo.png'),'THIRST_potion':pygame.image.load('images/items/waterbottle.png')}
         self.overworld_frames = {'Characters': all_character_import('./images/zero')}
-        self.item_Frames={'HP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'XP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'THIRST_potion':pygame.image.load(join('icons','shovel-removebg-preview.png'))}
+        self.item_Frames={'HP_potion':pygame.image.load('images/items/healthpo.png'),'XP_potion':pygame.image.load('images/items/bluepo.png'),'THIRST_potion':pygame.image.load(join('images/items/waterbottle.png'))}
         self.fonts={
             'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
@@ -117,15 +118,23 @@ class Game:
         for obj in tmx_map.get_layer_by_name('Transition'):
             # print(obj.properties)
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
+            print(obj.properties['target'])
         if map=='world':
             for obj in tmx_map.get_layer_by_name('Train'):
                 TrainStripe((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.train_sprites)
 
 
+
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
-                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools)
+                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools, self.player_stat)
                 self.camera = Camera(self.player,self.all_sprites)
+                self.tool_index = ToolIndex(self.player_tools, self.fonts, self.tool_Frames)
+                self.player_index = PlayerIndex(self.player, self.fonts,
+                                                pygame.image.load(join('images', 'player', 'down', '0.png')),
+                                                self.tool_Frames)
+                self.traing_index = TrainingIndex(self.fonts, self.player, self.player_tools, self.item_Frames,
+                                                  self.tool_Frames['icons'])
                 # self.gun = Gun(self.player, self.all_sprites)
             if obj.name == 'Character' and obj.properties['character_id']=='zero' :
                 print(obj.x,obj.y,1001010)
@@ -214,6 +223,8 @@ class Game:
             if self.tint_progress>=255:
                 print(self.transition_target)
                 print(self.player.selected_tool)
+                if self.transition_target[0]=='room':
+                    self.player.playerstat.key=True
                 self.setup(self.tmx_maps[self.transition_target[0]],self.transition_target[1],self.transition_target[0])
                 self.tint_mode='untint'
                 self.transition_target=None
@@ -233,7 +244,7 @@ class Game:
                     game.went()
             self.display_surface.fill('black')
             title_font=self.fonts['title']
-            title_text = title_font.render("holes", True, COLORS['gold'])
+            title_text = title_font.render("HOLES 고도형,이유진", True, COLORS['gold'])
             press_font=self.fonts['bold']
             press=press_font.render("press space to enter", True, COLORS['pure white'])
             press1 = press_font.render("press q to see the manual", True, COLORS['pure white'])
@@ -299,6 +310,7 @@ class Game:
             print('aaa')
 
 
+
             self.display_surface.fill('black')
 
             title_font = self.fonts['explain']
@@ -355,33 +367,43 @@ class Game:
             #if self.dialog_tree: self.dialog_tree.update()s
             if self.index_open:
                 self.tool_index.update(dt)
-            if self.index_open1:
+            elif self.index_open1:
                 self.player_index.update(dt)
-            if self.index_open2:
+            elif self.index_open2:
                 self.traing_index.update()
+            else:
+                # HP바
+                draw_bar(
+                    surface=self.display_surface,
+                    rect=pygame.FRect(0, 0, 100, 20).move_to(
+                        midbottom=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 70)),
+                    value=self.player.hp,
+                    max_value=self.player.max_hp,
+                    color=COLORS['red'],
+                    bg_color=COLORS['white'],
+                    radius=2)
+
 
             self.player.get_current_tool(self.tool_index.selected_tool)
             self.player_index.get_player(self.player)
+
+            #땅파기 정도
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,
                 rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-90)),
                 value=pygame.time.get_ticks()-self.key_down_time,
-                max_value=1000,
+                max_value=self.player.digtime,
                 color=COLORS['white'],
                 bg_color=COLORS['black']
             )
-            draw_bar(
-            surface=self.display_surface,
-            rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-70)),
-            value=self.player.hp,
-            max_value=self.player.max_hp,
-            color=COLORS['red'],
-            bg_color=COLORS['white'] )
-
 
 
             if self.dialog_tree: self.dialog_tree.update()
+
+            if pygame.key.get_just_pressed()[pygame.K_f]:
+                self.player.coin+=1
+                self.player.stat_update()
 
             if 0.0<=Game.k and Game.k<2.0:
                 Game.k+=0.01

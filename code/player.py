@@ -1,6 +1,6 @@
 import pygame
 from pygame import Vector2
-from main import *
+
 from settings import *
 from math import *
 from game_data import *
@@ -74,9 +74,8 @@ class Character(Entity):
 
     def update(self,dt):
         self.animate(dt)
-
 class Player(pygame.sprite.Sprite):
-    def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic):
+    def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic,playerstat):
         super().__init__(groups)
         self.groups = groups
         self.load_images()
@@ -110,9 +109,9 @@ class Player(pygame.sprite.Sprite):
         self.tools=['Shovel','Gun']
         self.tool = tool_dic
         self.tool_index = None
+        print(self.tool[0].level)
 
-
-        self.level = 0
+        self.level = playerstat.level
         self.max_hp = STAT_DATA[self.level]['max_hp']  #
         self.need_xp = STAT_DATA[self.level]['need_xp']  #
         self.max_thirst = STAT_DATA[self.level]['max_thirst']
@@ -120,26 +119,55 @@ class Player(pygame.sprite.Sprite):
         self.digspeed = STAT_DATA[self.level]['digspeed']
         self.stat = {'damage': self.damage, 'digspeed': self.digspeed}
         # self.selected_tool = self.tools[self.tool_index]
+        self.playerstat=playerstat
+
         #interaction
         self.sand_sprites=sand_sprites
         self.key_down_time=0 #땅파기 시작
         self.key_up_time=0 #땅파기 끝
-        self.hp=self.max_hp
-        self.xp=25
-        self.thirst=10
-        self.endgame = False
+        self.hp=playerstat.hp
+        self.xp=playerstat.xp
+        self.thirst=playerstat.thirst
+        self.endgame=False
+        self.digtime=1000/self.digspeed*60
+        self.coin=playerstat.coin
+        print(playerstat.coin)
 
 
-        self.key=False
-        self.coin=0
+
     #basuc stats
     def stat_update(self):
+
+
+        #player
         self.max_hp=STAT_DATA[self.level]['max_hp'] #
         self.need_xp=STAT_DATA[self.level]['need_xp']#
         self.max_thirst=STAT_DATA[self.level]['max_thirst']
-        self.damage=STAT_DATA[self.level]['damage']
-        self.digspeed=STAT_DATA[self.level]['digspeed']
+
+        if self.selected_tool:
+            self.damage=STAT_DATA[self.level]['damage']+self.selected_tool.plusdamage
+            self.digspeed=STAT_DATA[self.level]['digspeed']+self.selected_tool.digspeed
+        else:
+            self.damage = STAT_DATA[self.level]['damage']
+            self.digspeed = STAT_DATA[self.level]['digspeed']
+
         self.stat={'damage':self.damage, 'digspeed': self.digspeed}
+
+        #tool
+        for k,v in self.tool.items():
+            v.tool_update()
+        self.digtime = 1000 / self.digspeed * 60
+
+        if self.xp>=self.need_xp:
+            self.xp-=self.need_xp
+            self.level+=1
+        self.playerstat.level=self.level
+        self.playerstat.hp=self.hp
+        self.playerstat.xp=self.xp
+        self.playerstat.thirst=self.thirst
+        self.playerstat.coin=self.coin
+
+
     def load_images(self):
         self.frames = {'left': [], 'right':[] , 'up':[],'down':[]}
         for state in self.frames.keys():
@@ -182,11 +210,12 @@ class Player(pygame.sprite.Sprite):
             if self.selected_tool.name == 'Shovel':
                 for sand in self.sand_sprites.sprites():
                     if sand.rect.collidepoint(self.target_pos):
-                        if t>=1000:
+                        if t>=self.digtime:
                             print('hello')
                             sand.damage()
                             self.coin+=1
-                            print(self.coin)
+                            self.xp+=5
+                            #소리 넣기
     #타깃 즉 모래위치
     def get_target_pos(self):
         self.target_pos= self.rect.center
@@ -202,14 +231,17 @@ class Player(pygame.sprite.Sprite):
         else: self.speed = 500
     def teleporting(self):
         keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_SPACE]:
-            for i in range(10):
-                PlayerClone(self.rect.center+self.direction*40*i, self.image, self.groups, i*50, 150)
-            # self.rect.centerx += (int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT]))*10
-            # self.rect.centery += (int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP]))*10
-            self.timedelay = True
-            self.hitbox_rect.center += self.direction * 280
-            self.rect.center = self.hitbox_rect.center
+        if self.selected_tool:
+            if self.selected_tool.name=='Shovel' and self.selected_tool.skill==True:
+
+                if keys[pygame.K_SPACE]:
+                    for i in range(10):
+                        PlayerClone(self.rect.center+self.direction*40*i, self.image, self.groups, i*50, 150)
+                    # self.rect.centerx += (int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT]))*10
+                    # self.rect.centery += (int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP]))*10
+                    self.timedelay = True
+                    self.hitbox_rect.center += self.direction * 280
+                    self.rect.center = self.hitbox_rect.center
     #일반공격 삽,총
     def normalattack(self):
 
@@ -257,14 +289,16 @@ class Player(pygame.sprite.Sprite):
                 PlayerClonespecial(self.rect.center - deltadirection , self.image, self.groups, 50*i, 1000, radius , pi + angle)
     def specialattack2(self):
         if pygame.key.get_just_pressed()[pygame.K_p]:
-            for i in range(21):
-                radius = 200
-                angle = 2*i*pi/20
-                deltadirection = pygame.Vector2(0,0)
-                PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle, self.attackstanley_sprites)
-            for sprite in self.attackstanley_sprites:
-                if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
-                    sprite.kill()
+            if self.selected_tool:
+                if self.selected_tool.name == 'Gun' and self.selected_tool.skill== True:
+                    for i in range(21):
+                        radius = 200
+                        angle = 2*i*pi/20
+                        deltadirection = pygame.Vector2(0,0)
+                        PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle, self.attackstanley_sprites)
+                    for sprite in self.attackstanley_sprites:
+                        if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
+                            sprite.kill()
     def block(self):
         self.blocked = True
         self.direction = Vector2(0, 0)
@@ -314,7 +348,14 @@ class Player(pygame.sprite.Sprite):
             self.collisionlizard()
             self.stat_update()
             self.checkkill()
-
+class Characterstat:
+    def __init__(self):
+        self.level=5
+        self.xp=0
+        self.hp=100
+        self.thirst=10
+        self.coin=0
+        self.key=False
 
 class PlayerIndex:
     def __init__(self,player,fonts,image,tool_frame):
@@ -554,7 +595,7 @@ class Warden(pygame.sprite.Sprite):
         for sprite in self.attack_sprites:
             if sprite.rect.colliderect(self.rect):
                 sprite.kill()
-                self.hp-=2000
+                self.hp-=self.player.damage
                 print(self.hp)
 
     def shootlizard(self):
@@ -785,7 +826,7 @@ class Giantlizard(pygame.sprite.Sprite):
         for sprite in self.attack_sprites:
             if sprite.rect.colliderect(self.rect):
                 sprite.kill()
-                self.hp-=2000
+                self.hp-=self.player.damage
                 print(self.hp)
 
     def shootlizard(self):

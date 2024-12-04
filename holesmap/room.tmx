@@ -27,7 +27,7 @@
   <object id="3" x="-214" y="-154" width="212" height="390"/>
   <object id="4" x="-170" y="194" width="493" height="188"/>
  </objectgroup>
- <objectgroup id="4" name="Trasition">
+ <objectgroup id="4" name="Transition">
   <object id="7" x="84" y="169" width="24" height="21">
    <properties>
     <property name="pos" value="room"/>
