@@ -1,5 +1,5 @@
 from pygame.time import get_ticks
-
+#타이머
 class Timer:
 	def __init__(self, duration, repeat = False, autostart = False, func = None):
 		self.duration = duration

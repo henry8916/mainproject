@@ -4,7 +4,7 @@ from math import atan2, degrees
 from settings import *
 import random
 
-
+#스프라이트끼리의 상호작용에 관한 코드
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups):
         super().__init__(groups)

@@ -1,6 +1,6 @@
 
 from settings import *
-
+#draw 함수 즉 모든 이미지를 그리는 함수
 class AllSprites(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
