@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="42">
+ <tileset firstgid="1" source="Tiletsx/Room_Builder_free_32x32.tsx"/>
+ <tileset firstgid="392" source="Tiletsx/interior.tsx"/>
+ <tileset firstgid="396" source="Tiletsx/Interiors_free_32x32.tsx"/>
+ <layer id="1" name="Ground" width="20" height="10">
+  <data encoding="csv">
+29,196,196,531,196,196,196,196,196,196,196,196,196,196,196,196,196,196,196,31,
+46,213,213,547,213,213,213,213,213,213,213,213,213,213,213,213,213,213,213,48,
+46,131,132,132,132,132,132,132,132,132,132,132,132,132,132,132,132,132,132,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+46,148,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,149,48,
+63,64,64,64,64,64,64,64,64,97,98,64,64,64,64,64,64,64,64,65
+</data>
+ </layer>
+ <objectgroup id="2" name="Entities">
+  <object id="1" name="Player" x="319" y="266">
+   <properties>
+    <property name="direction" value="up"/>
+    <property name="pos" value="world"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="39" name="Player" x="129.5" y="85">
+   <properties>
+    <property name="direction" value="down"/>
+    <property name="pos" value="room"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="5" name="Collision">
+  <object id="13" x="-147" y="-173" width="874" height="220"/>
+  <object id="14" x="-160" y="-160" width="187" height="581"/>
+  <object id="15" x="618" y="-87" width="187" height="496"/>
+  <object id="16" x="-96" y="296" width="380" height="157"/>
+  <object id="17" x="354" y="293" width="350" height="179"/>
+  <object id="24" x="341" y="232" width="11" height="56.5"/>
+  <object id="25" x="281" y="186" width="9" height="57.5"/>
+  <object id="27" x="393.5" y="184.5" width="15.5" height="55"/>
+  <object id="30" x="183.5" y="139" width="280" height="57"/>
+  <object id="31" x="519" y="190.5" width="64" height="66"/>
+  <object id="32" x="73" y="125.5" width="110" height="14.5"/>
+  <object id="33" x="195" y="249" width="12" height="34"/>
+  <object id="34" x="117" y="188" width="65.5" height="6.5"/>
+  <object id="35" x="412.5" y="28.5" width="6.5" height="58"/>
+  <object id="37" x="183" y="97" width="11" height="41"/>
+  <object id="41" x="184" y="63" width="10.5" height="36"/>
+ </objectgroup>
+ <objectgroup id="4" name="Objects">
+  <object id="5" gid="393" x="31" y="132" width="45" height="87"/>
+  <object id="6" gid="395" x="561" y="92" width="57" height="75"/>
+  <object id="7" gid="395" x="524" y="92" width="57" height="75"/>
+  <object id="10" gid="395" x="486" y="92" width="57" height="75"/>
+  <object id="11" gid="394" x="42" y="172" width="36" height="84"/>
+  <object id="12" gid="394" x="572.667" y="145.333" width="36" height="84"/>
+ </objectgroup>
+ <objectgroup id="3" name="Transition">
+  <object id="2" x="289" y="302" width="60" height="15">
+   <properties>
+    <property name="pos" value="wardenhouse"/>
+    <property name="target" value="world"/>
+   </properties>
+  </object>
+  <object id="38" x="75.5" y="65" width="34" height="28.5">
+   <properties>
+    <property name="pos" value="wardenhouse"/>
+    <property name="target" value="room"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
