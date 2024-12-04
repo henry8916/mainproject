@@ -118,6 +118,7 @@ class Player(pygame.sprite.Sprite):
         self.endgame = False
 
 
+
         self.coin=0
     #basuc stats
     def stat_update(self):
