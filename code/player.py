@@ -1,6 +1,6 @@
 import pygame
 from pygame import Vector2
-
+from main import *
 from settings import *
 from math import *
 from game_data import *
@@ -49,20 +49,32 @@ class Entity(pygame.sprite.Sprite):
         self.blocked=False
 
 class Character(Entity):
-    def __init__(self, pos, frames, groups, facing_direction,character_data):
+    z=1
+    def __init__(self, pos, frames, groups, facing_direction,character_data,player,lizard):
         super().__init__(pos, frames, groups, facing_direction)
         self.character_data = character_data
+        self.player=player
+        self.lizard=lizard
         # self.facing_direction=facing_direction
         # movement
         # self.view_directions = character_data['directions']
 
 
     def get_dialog(self):
+        if self.player.level==2:
+            Character.z=5
+        if self.player.level==5:
+            Character.z=2
+        if self.player.playerstat.key:
+            Character.z=4
+        if self.player.level==10:
+            Character.z=3
 
-        return self.character_data[1]
+        return self.character_data[Character.z]
 
     def update(self,dt):
         self.animate(dt)
+
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic):
         super().__init__(groups)
@@ -118,6 +130,7 @@ class Player(pygame.sprite.Sprite):
         self.endgame = False
 
 
+        self.key=False
         self.coin=0
     #basuc stats
     def stat_update(self):
@@ -398,7 +411,7 @@ class PlayerIndex:
 
         #stat
         i=0
-        for k,v in self.playker.stat.items():
+        for k,v in self.player.stat.items():
             i+=1
             draw_text_in_box(
                 surface=self.display_surface,
@@ -518,7 +531,7 @@ class Warden(pygame.sprite.Sprite):
         self.clockfireball = pygame.time.get_ticks()
         self.display_surface = display_surface
         self.groups = groups
-        self.hp = 2000
+        self.hp = 10000
         self.angle=0
         self.clockforfireballlizard = pygame.time.get_ticks()
         self.player = player
@@ -526,6 +539,15 @@ class Warden(pygame.sprite.Sprite):
         self.clockshootcheck = True
         self.clockshootfireball = pygame.time.get_ticks()
         self.clockshootfireball2 = pygame.time.get_ticks()
+        self.fonts = {
+            'dialog': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 30),
+            'regular': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 18),
+            'small': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 14),
+            'bold': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 40),
+            'title': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 100),
+            'explain': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 25),
+            'Mr.sir': pygame.font.Font(join('font', 'HakgyoansimTuhoOTFR.otf'), 50)
+        }
 
 
     def collisionbullet(self):
@@ -549,6 +571,17 @@ class Warden(pygame.sprite.Sprite):
             Lizardforfireball(self.rect.center+pygame.Vector2(-100,0), self.player, (self.groups , self.attackstanley_sprites ), self.attack_sprites)
             self.clockfireball = pygame.time.get_ticks()
     def checkdie(self):
+        if self.hp<=0:
+            self.clockforwarden=pygame.time.get_ticks()
+            while pygame.time.get_ticks() - self.clockforwarden < 3000:
+                rect_x, rect_y, rect_width, rect_height = 250, 300, 780, 80
+                pygame.draw.rect(self.display_surface, COLORS['pure white'], (rect_x, rect_y, rect_width, rect_height))
+                title_font = self.fonts['bold']
+                title_text1 = title_font.render("내가 패배했다...", True, COLORS['black'])
+                self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
+                pygame.display.update()
+            self.kill()
+
         if self.hp<=0:
             self.player.endgame = True
     def shootfireball(self):

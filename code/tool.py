@@ -194,11 +194,12 @@ class ToolIndex:
         self.input()
         self.display_surface.blit(self.tint_surf,(0,0))
         # pygame.draw.rect(self.display_surface,'black',self.main_rect)
-
-        #tint the main game
-        #display the list
+        print('hello')
         self.display_list()
         self.display_main()
+        #tint the main game
+        #display the list
+
 
 
 

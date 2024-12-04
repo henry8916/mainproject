@@ -70,7 +70,7 @@ class Game:
         self.index_open=False
         self.index_open1=False
         self.index_open2=False
-        self.clockforgiant = pygame.time.get_ticks()
+
 
 
     def import_assets(self):
@@ -133,7 +133,9 @@ class Game:
                           frames=self.overworld_frames['Characters']['zeroall'],
                           groups=(self.all_sprites,self.collision_sprites,self.character_sprites),
                           facing_direction = obj.properties['direction'],
-                          character_data=PLAYER_DATA[obj.properties['character_id']])
+                          character_data=PLAYER_DATA[obj.properties['character_id']],
+                          player=self.player,
+                          lizard=self.giant)
             if obj.name == 'Character' and obj.properties['character_id']=='warden':
                 print(obj.properties)
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
@@ -172,6 +174,12 @@ class Game:
                         character.change_facing_direction(self.player.rect.center)
                         self.create_dialog(character)
 
+            # if pygame.key.get_just_pressed()[pygame.K_RETURN]:
+            #     self.index_open = not self.index_open
+            #     self.player.blocked = not self.player.blocked
+            # if pygame.key.get_just_pressed()[pygame.K_RSHIFT]:
+            #     self.index_open1 = not self.index_open1
+            #     self.player.blocked = not self.player.blocked
 
     def create_dialog(self, character):
         if not self.dialog_tree:
@@ -223,13 +231,17 @@ class Game:
                     sys.exit()
                 if keys[pygame.K_SPACE]:
                     game.go()
+                if keys[pygame.K_q]:
+                    game.went()
             self.display_surface.fill('black')
             title_font=self.fonts['title']
             title_text = title_font.render("holes", True, COLORS['gold'])
             press_font=self.fonts['bold']
             press=press_font.render("press space to enter", True, COLORS['pure white'])
+            press1 = press_font.render("press q to see the manual", True, COLORS['pure white'])
             self.display_surface.blit(title_text, (WINDOW_WIDTH // 2 - title_text.get_width() // 2, 300))
             self.display_surface.blit(press, (WINDOW_WIDTH // 2 - press.get_width() // 2, 400))
+            self.display_surface.blit(press1, (WINDOW_WIDTH // 2 - press.get_width() // 2, 430))
             pygame.display.update()
 
     def go(self):
@@ -265,6 +277,21 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 375))
 
             pygame.display.update()
+    def went(self):
+        while True:
+            for event in pygame.event.get():
+                keys = pygame.key.get_pressed()
+                if event.type==pygame.QUIT:
+                    sys.exit()
+                if keys[pygame.K_q]:
+                    game.black_out()
+            self.display_surface.fill('black')
+            title_font = self.fonts['bold']
+            title_text1 = title_font.render("키 설명\n 방향키 wasd        인벤토리 enter \n 대시 space        캐릭터 정보 R_shift\n 구멍파기 o     대화하기 i     분신술 p", True, COLORS['pure white'])
+            self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
+
+            pygame.display.update()
+
     def Go(self):
         while True:
             for event in pygame.event.get():
@@ -337,6 +364,8 @@ class Game:
 
             self.player.get_current_tool(self.tool_index.selected_tool)
             self.player_index.get_player(self.player)
+
+
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,
@@ -382,16 +411,23 @@ class Game:
             self.tint_screen(dt)
             if self.giant:
                 if self.giant.get_live():
+                    Character.z=6
+                    self.clockforgiant = pygame.time.get_ticks()
 
                     self.setup(self.tmx_maps['world'],'tent','world')
                     talk_rect = pygame.FRect(0, 0, WINDOW_WIDTH* 0.6, WINDOW_HEIGHT * 0.3).move_to(center=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT * 0.7))
-                    # while pygame.time.get_ticks() - self.clockforgiant <500:
-                    #     surf = self.fonts['explain'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black'])
-                    #     rect = surf.get_frect(center=talk_rect.center)
-                    #     pygame.draw.rect(self.display_surface,COLORS['black'],talk_rect)
-                    #     self.display_surface.blit(surf, rect)
-                    #     pygame.display.update()
-                    draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
+                    self.clocking=pygame.time.get_ticks()
+                    while pygame.time.get_ticks()-self.clocking:
+                        pass
+                    print(self.clockforgiant, pygame.time.get_ticks())
+                    while pygame.time.get_ticks() - self.clockforgiant <5000:
+                        rect_x, rect_y, rect_width, rect_height = 250, 600, 780, 80
+                        pygame.draw.rect(self.display_surface, COLORS['pure white'],(rect_x, rect_y, rect_width, rect_height))
+                        title_font =  self.fonts['bold']
+                        title_text1 = title_font.render("왕도마뱀을 잡았다!", True, COLORS['black'])
+                        self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 620))
+                        pygame.display.update()
+                    # draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
 
             pygame.display.update()
             if self.player.endgame:

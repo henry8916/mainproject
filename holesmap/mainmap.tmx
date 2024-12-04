@@ -158,7 +158,7 @@
    </properties>
    <point/>
   </object>
-  <object id="314" name="Character" x="2698.33" y="557.333">
+  <object id="314" name="Character" x="2600.33" y="850.333">
    <properties>
     <property name="character_id" value="zero"/>
     <property name="direction" value="left"/>
