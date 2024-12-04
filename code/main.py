@@ -25,8 +25,8 @@ class Game:
 
         # tool
         self.player_tools={
-            0:Tool('Shovel',1),
-            1:Tool('Gun',1),
+            0:Tool('Shovel',5),
+            1:Tool('Gun',5),
         }
         self.player_stat=Characterstat()
 
@@ -75,7 +75,7 @@ class Game:
 
 
     def import_assets(self):
-        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx')), 'battlefield':load_pygame(join('holesmap','battlefield.tmx'))}
+        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx')), 'battlefield':load_pygame(join('holesmap','battlefield.tmx')), 'room':load_pygame(join('holesmap','room.tmx'))}
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
@@ -95,6 +95,7 @@ class Game:
 
         #sprites
     def setup(self, tmx_map, player_start_pos,map):
+
 
         #map clear
         for group in (self.all_sprites, self.collision_sprites, self.transition_sprites):
@@ -127,6 +128,12 @@ class Game:
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
                 self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools, self.player_stat)
                 self.camera = Camera(self.player,self.all_sprites)
+                self.tool_index = ToolIndex(self.player_tools, self.fonts, self.tool_Frames)
+                self.player_index = PlayerIndex(self.player, self.fonts,
+                                                pygame.image.load(join('images', 'player', 'down', '0.png')),
+                                                self.tool_Frames)
+                self.traing_index = TrainingIndex(self.fonts, self.player, self.player_tools, self.item_Frames,
+                                                  self.tool_Frames['icons'])
                 # self.gun = Gun(self.player, self.all_sprites)
             if obj.name == 'Character' and obj.properties['character_id']=='zero' :
                 print(obj.x,obj.y,1001010)
@@ -215,6 +222,8 @@ class Game:
             if self.tint_progress>=255:
                 print(self.transition_target)
                 print(self.player.selected_tool)
+                if self.transition_target[0]=='room':
+                    self.player.playerstat.key=True
                 self.setup(self.tmx_maps[self.transition_target[0]],self.transition_target[1],self.transition_target[0])
                 self.tint_mode='untint'
                 self.transition_target=None
@@ -371,8 +380,10 @@ class Game:
 
 
             if self.dialog_tree: self.dialog_tree.update()
+
             if pygame.key.get_just_pressed()[pygame.K_f]:
                 self.player.coin+=1
+                self.player.stat_update()
 
             if 0.0<=Game.k and Game.k<2.0:
                 Game.k+=0.01
@@ -401,12 +412,7 @@ class Game:
 
                     self.setup(self.tmx_maps['world'],'tent','world')
                     talk_rect = pygame.FRect(0, 0, WINDOW_WIDTH* 0.6, WINDOW_HEIGHT * 0.3).move_to(center=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT * 0.7))
-                    # while pygame.time.get_ticks() - self.clockforgiant <500:
-                    #     surf = self.fonts['explain'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black'])
-                    #     rect = surf.get_frect(center=talk_rect.center)
-                    #     pygame.draw.rect(self.display_surface,COLORS['black'],talk_rect)
-                    #     self.display_surface.blit(surf, rect)
-                    #     pygame.display.update()
+
                     draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
 
             pygame.display.update()

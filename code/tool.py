@@ -7,7 +7,6 @@ from support import *
 #장비 클래스 삽이랑 총 자동차는 모르겠음
 class Tool:
     def __init__(self, name, level):
-        self.locked=True
         self.name,self.level=name,level
         # stats
         self.digspeed=TOOL_DATA[name]['level'][level]['digspeed']
@@ -23,6 +22,7 @@ class Tool:
         self.skill = TOOL_DATA[self.name]['level'][self.level]['skill']
         self.guide = TOOL_DATA[self.name]['guide'][self.level]
         self.stat = [self.plusdamage, self.digspeed, self.skill]
+        self.cost = TOOL_DATA[self.name]['level'][self.level]['need_coin']
 
 
 class Item:
@@ -444,7 +444,7 @@ class TrainingIndex:
         level_surf = self.fonts['explain'].render(f'level: {tool.level}/10', False, COLORS['white'])
         level_rect = level_surf.get_frect(midtop=top_rect.midbottom + Vector2(0, 60))
         self.display_surface.blit(level_surf, level_rect)
-
+        print(self.player.coin)
         coin_surf = self.fonts['explain'].render(f'need {self.player.coin}/{tool.cost}coin', False, COLORS['white'])
         coin_rect = coin_surf.get_frect(midtop=top_rect.midbottom + Vector2(0, 100))
         self.display_surface.blit(coin_surf, coin_rect)
@@ -473,6 +473,7 @@ class TrainingIndex:
                 if self.player.coin>=tool.cost:
                     self.player.tool[self.index2].level+=1
                     self.player.coin -=tool.cost
+                    self.player.tool[self.index2].tool_update()
 
                 # 눌린 상태였다면
 

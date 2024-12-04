@@ -117,12 +117,16 @@ class Player(pygame.sprite.Sprite):
         self.hp=playerstat.hp
         self.xp=playerstat.xp
         self.thirst=playerstat.thirst
-
+        self.endgame=False
         self.digtime=1000/self.digspeed*60
-
         self.coin=playerstat.coin
+        print(playerstat.coin)
+
+
+
     #basuc stats
     def stat_update(self):
+
 
         #player
         self.max_hp=STAT_DATA[self.level]['max_hp'] #
@@ -151,6 +155,8 @@ class Player(pygame.sprite.Sprite):
         self.playerstat.xp=self.xp
         self.playerstat.thirst=self.thirst
         self.playerstat.coin=self.coin
+
+
     def load_images(self):
         self.frames = {'left': [], 'right':[] , 'up':[],'down':[]}
         for state in self.frames.keys():
@@ -215,14 +221,17 @@ class Player(pygame.sprite.Sprite):
         else: self.speed = 500
     def teleporting(self):
         keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_SPACE]:
-            for i in range(10):
-                PlayerClone(self.rect.center+self.direction*40*i, self.image, self.groups, i*50, 150)
-            # self.rect.centerx += (int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT]))*10
-            # self.rect.centery += (int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP]))*10
-            self.timedelay = True
-            self.hitbox_rect.center += self.direction * 280
-            self.rect.center = self.hitbox_rect.center
+        if self.selected_tool:
+            if self.selected_tool.name=='Shovel' and self.selected_tool.skill==True:
+
+                if keys[pygame.K_SPACE]:
+                    for i in range(10):
+                        PlayerClone(self.rect.center+self.direction*40*i, self.image, self.groups, i*50, 150)
+                    # self.rect.centerx += (int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT]))*10
+                    # self.rect.centery += (int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP]))*10
+                    self.timedelay = True
+                    self.hitbox_rect.center += self.direction * 280
+                    self.rect.center = self.hitbox_rect.center
     #일반공격 삽,총
     def normalattack(self):
 
@@ -270,14 +279,16 @@ class Player(pygame.sprite.Sprite):
                 PlayerClonespecial(self.rect.center - deltadirection , self.image, self.groups, 50*i, 1000, radius , pi + angle)
     def specialattack2(self):
         if pygame.key.get_just_pressed()[pygame.K_p]:
-            for i in range(21):
-                radius = 200
-                angle = 2*i*pi/20
-                deltadirection = pygame.Vector2(0,0)
-                PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle, self.attackstanley_sprites)
-            for sprite in self.attackstanley_sprites:
-                if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
-                    sprite.kill()
+            if self.selected_tool:
+                if self.selected_tool.name == 'Gun' and self.selected_tool.skill== True:
+                    for i in range(21):
+                        radius = 200
+                        angle = 2*i*pi/20
+                        deltadirection = pygame.Vector2(0,0)
+                        PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle, self.attackstanley_sprites)
+                    for sprite in self.attackstanley_sprites:
+                        if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
+                            sprite.kill()
     def block(self):
         self.blocked = True
         self.direction = Vector2(0, 0)
@@ -329,11 +340,12 @@ class Player(pygame.sprite.Sprite):
             self.checkkill()
 class Characterstat:
     def __init__(self):
-        self.level=0
+        self.level=5
         self.xp=0
         self.hp=100
         self.thirst=10
         self.coin=0
+        self.key=False
 
 class PlayerIndex:
     def __init__(self,player,fonts,image,tool_frame):
