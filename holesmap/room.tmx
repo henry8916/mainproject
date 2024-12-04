@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="6" height="6" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="10">
+ <tileset firstgid="1" source="Tiletsx/Room_Builder_free_32x32.tsx"/>
+ <tileset firstgid="392" source="Tiletsx/key.tsx"/>
+ <layer id="1" name="Ground" width="6" height="6">
+  <data encoding="csv">
+222,223,223,223,223,224,
+239,240,240,240,240,241,
+183,183,183,183,183,183,
+183,183,183,183,183,183,
+183,183,183,183,183,183,
+183,183,183,183,183,183
+</data>
+ </layer>
+ <objectgroup id="2" name="Entities">
+  <object id="8" name="Player" x="98" y="161">
+   <properties>
+    <property name="direction" value="up"/>
+    <property name="pos" value="wardenhouse"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="Collision">
+  <object id="1" x="-160" y="-133" width="570" height="152"/>
+  <object id="2" x="194" y="-89" width="281" height="328"/>
+  <object id="3" x="-214" y="-154" width="212" height="390"/>
+  <object id="4" x="-170" y="194" width="493" height="188"/>
+ </objectgroup>
+ <objectgroup id="4" name="Trasition">
+  <object id="7" x="84" y="169" width="24" height="21">
+   <properties>
+    <property name="pos" value="room"/>
+    <property name="target" value="wardenhouse"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="5" name="Objects">
+  <object id="9" gid="393" x="71" y="104" width="48" height="48"/>
+ </objectgroup>
+</map>
