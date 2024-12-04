@@ -196,8 +196,6 @@ class ToolIndex:
         #display the list
 
 
-
-
 class TrainingIndex:
     def __init__(self,fonts,player,tool,item_frames,tool_frames):
         self.display_surface = pygame.display.get_surface()

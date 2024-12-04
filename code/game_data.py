@@ -106,8 +106,6 @@ ITEM_DATA={
     }
 }
 
-
-
 STAT_DATA={
             0:{'max_hp':100, 'need_xp':100, 'max_thirst':10, 'damage':10, 'digspeed':1},
             1:{'max_hp':120, 'need_xp':150, 'max_thirst':20, 'damage':20,'digspeed':2},

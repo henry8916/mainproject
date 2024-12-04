@@ -50,24 +50,23 @@ class Entity(pygame.sprite.Sprite):
 
 class Character(Entity):
     z=1
-    def __init__(self, pos, frames, groups, facing_direction,character_data,player,lizard):
+    def __init__(self, pos, frames, groups, facing_direction,character_data,player):
         super().__init__(pos, frames, groups, facing_direction)
         self.character_data = character_data
         self.player=player
-        self.lizard=lizard
         # self.facing_direction=facing_direction
         # movement
         # self.view_directions = character_data['directions']
 
 
     def get_dialog(self):
-        if self.player.level==2:
+        if 5>self.player.playerstat.level>=2:
             Character.z=5
-        if self.player.level==5:
+        if 10>=self.player.playerstat.level>=5 and not self.player.playerstat.lizard:
             Character.z=2
         if self.player.playerstat.key:
             Character.z=4
-        if self.player.level==10:
+        if self.player.playerstat.level==10:
             Character.z=3
 
         return self.character_data[Character.z]
@@ -350,12 +349,13 @@ class Player(pygame.sprite.Sprite):
             self.checkkill()
 class Characterstat:
     def __init__(self):
-        self.level=5
+        self.level=0
         self.xp=0
         self.hp=100
         self.thirst=10
-        self.coin=0
+        self.coin=1000
         self.key=False
+        self.lizard=False
 
 class PlayerIndex:
     def __init__(self,player,fonts,image,tool_frame):
@@ -816,7 +816,7 @@ class Giantlizard(pygame.sprite.Sprite):
         self.groups = groups
         self.collision_sprites = collision_sprites
         self.display_surface = display_surface
-        self.hp = 20000
+        self.hp = 2000
         self.angle=0
         self.clockf = pygame.time.get_ticks()
         self.player = player

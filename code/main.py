@@ -25,8 +25,8 @@ class Game:
 
         # tool
         self.player_tools={
-            0:Tool('Shovel',5),
-            1:Tool('Gun',5),
+            0:Tool('Shovel',1),
+            1:Tool('Gun',1),
         }
         self.player_stat=Characterstat()
 
@@ -142,7 +142,8 @@ class Game:
                           frames=self.overworld_frames['Characters']['zeroall'],
                           groups=(self.all_sprites,self.collision_sprites,self.character_sprites),
                           facing_direction = obj.properties['direction'],
-                          character_data=PLAYER_DATA[obj.properties['character_id']])
+                          character_data=PLAYER_DATA[obj.properties['character_id']],
+                          player=self.player)
             if obj.name == 'Character' and obj.properties['character_id']=='warden' and self.player.level>=10:
                 print(obj.properties)
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
@@ -219,12 +220,14 @@ class Game:
             self.tint_progress -=self.tint_speed*dt
 
         if  self.tint_mode=='tint':
-            self.tint_progress += self.tint_speed*dt
+            self.tint_progress += self.tint_speed*dts
             if self.tint_progress>=255:
                 print(self.transition_target)
                 print(self.player.selected_tool)
                 if self.transition_target[0]=='room':
                     self.player.playerstat.key=True
+                if self.transition_target[0]=='battlefield':
+                    self.player.playerstat.lizard=True
                 self.setup(self.tmx_maps[self.transition_target[0]],self.transition_target[1],self.transition_target[0])
                 self.tint_mode='untint'
                 self.transition_target=None
@@ -402,7 +405,7 @@ class Game:
             if self.dialog_tree: self.dialog_tree.update()
 
             if pygame.key.get_just_pressed()[pygame.K_f]:
-                self.player.coin+=1
+                self.player.coin+=10
                 self.player.stat_update()
 
             if 0.0<=Game.k and Game.k<2.0:
@@ -454,14 +457,6 @@ class Game:
                 self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
                 self.Go()
-
-            # while pygame.time.get_ticks() - self.clockforgiant < 500:
-            #     pass
-
-
-
-
-
 
 
         # pygame.quit()
