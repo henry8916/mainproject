@@ -70,7 +70,7 @@ class Game:
         self.index_open=False
         self.index_open1=False
         self.index_open2=False
-
+        self.clockforgiant = pygame.time.get_ticks()
 
 
     def import_assets(self):
@@ -133,13 +133,11 @@ class Game:
                           frames=self.overworld_frames['Characters']['zeroall'],
                           groups=(self.all_sprites,self.collision_sprites,self.character_sprites),
                           facing_direction = obj.properties['direction'],
-                          character_data=PLAYER_DATA[obj.properties['character_id']],
-                          player=self.player,
-                          lizard=self.giant)
-            if obj.name == 'Character' and obj.properties['character_id']=='warden':
+                          character_data=PLAYER_DATA[obj.properties['character_id']])
+            if obj.name == 'Character' and obj.properties['character_id']=='warden' and self.player.level>=10:
                 print(obj.properties)
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
-            if obj.name == 'Character' and obj.properties['character_id']=='lizard':
+            if obj.name == 'Character' and obj.properties['character_id']=='lizard' and self.player.level>=5:
                 self.giant = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
@@ -174,12 +172,6 @@ class Game:
                         character.change_facing_direction(self.player.rect.center)
                         self.create_dialog(character)
 
-            # if pygame.key.get_just_pressed()[pygame.K_RETURN]:
-            #     self.index_open = not self.index_open
-            #     self.player.blocked = not self.player.blocked
-            # if pygame.key.get_just_pressed()[pygame.K_RSHIFT]:
-            #     self.index_open1 = not self.index_open1
-            #     self.player.blocked = not self.player.blocked
 
     def create_dialog(self, character):
         if not self.dialog_tree:
@@ -200,7 +192,13 @@ class Game:
     # transition system
     def transition_check(self):
         sprites=[sprite for sprite in self.transition_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
-        if sprites:
+        if sprites and (not sprites[0].target[0]=='centerhouse' or self.player.level>=10) and (not sprites[0].target[0]=='battlefield' or self.player.level>=5):
+        # if sprites:
+            print(self.player.level)
+            print(sprites[0].target[0])
+            # 'battlefield'
+            #
+            # 'centerhouse'
             self.player.block()
             self.transition_target=sprites[0].target
             self.tint_mode='tint'
@@ -364,8 +362,6 @@ class Game:
 
             self.player.get_current_tool(self.tool_index.selected_tool)
             self.player_index.get_player(self.player)
-
-
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,
