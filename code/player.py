@@ -117,6 +117,7 @@ class Player(pygame.sprite.Sprite):
         self.thirst=10
         self.endgame = False
 
+
         self.coin=0
     #basuc stats
     def stat_update(self):

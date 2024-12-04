@@ -273,6 +273,7 @@ class Game:
                     sys.exit()
             print('aaa')
 
+
             self.display_surface.fill('black')
 
             title_font = self.fonts['explain']
