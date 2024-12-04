@@ -117,9 +117,11 @@ class Game:
         for obj in tmx_map.get_layer_by_name('Transition'):
             # print(obj.properties)
             TransitionSprite((obj.x*2, obj.y*2),pygame.Surface((obj.width*2,obj.height*2)), (obj.properties['target'], obj.properties['pos']),self.transition_sprites)
+            print(obj.properties['target'])
         if map=='world':
             for obj in tmx_map.get_layer_by_name('Train'):
                 TrainStripe((obj.x * 2, obj.y * 2), pygame.Surface((obj.width * 2, obj.height * 2)), obj.name, self.train_sprites)
+
 
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
@@ -134,10 +136,10 @@ class Game:
                           groups=(self.all_sprites,self.collision_sprites,self.character_sprites),
                           facing_direction = obj.properties['direction'],
                           character_data=PLAYER_DATA[obj.properties['character_id']])
-            if obj.name == 'Character' and obj.properties['character_id']=='warden':
+            if obj.name == 'Character' and obj.properties['character_id']=='warden' and self.player.level>=10:
                 print(obj.properties)
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
-            if obj.name == 'Character' and obj.properties['character_id']=='lizard':
+            if obj.name == 'Character' and obj.properties['character_id']=='lizard' and self.player.level>=5:
                 self.giant = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
@@ -192,7 +194,13 @@ class Game:
     # transition system
     def transition_check(self):
         sprites=[sprite for sprite in self.transition_sprites if sprite.rect.colliderect(self.player.hitbox_rect)]
-        if sprites:
+        if sprites and (not sprites[0].target[0]=='centerhouse' or self.player.level>=10) and (not sprites[0].target[0]=='battlefield' or self.player.level>=5):
+        # if sprites:
+            print(self.player.level)
+            print(sprites[0].target[0])
+            # 'battlefield'
+            #
+            # 'centerhouse'
             self.player.block()
             self.transition_target=sprites[0].target
             self.tint_mode='tint'

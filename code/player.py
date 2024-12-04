@@ -399,7 +399,7 @@ class PlayerIndex:
 
         #stat
         i=0
-        for k,v in self.playker.stat.items():
+        for k,v in self.player.stat.items():
             i+=1
             draw_text_in_box(
                 surface=self.display_surface,
