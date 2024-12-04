@@ -136,7 +136,7 @@ class Game:
                           character_data=PLAYER_DATA[obj.properties['character_id']])
             if obj.name == 'Character' and obj.properties['character_id']=='warden':
                 print(obj.properties)
-                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player)
+                self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
             if obj.name == 'Character' and obj.properties['character_id']=='lizard':
                 self.giant = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
@@ -265,6 +265,26 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 375))
 
             pygame.display.update()
+    def Go(self):
+        while True:
+            for event in pygame.event.get():
+                keys = pygame.key.get_pressed()
+                if event.type==pygame.QUIT:
+                    sys.exit()
+            print('aaa')
+
+            self.display_surface.fill('black')
+
+            title_font = self.fonts['explain']
+            title_text1 = title_font.render("축하합니다", True, COLORS['pure white'])
+            title_text2 = title_font.render("스탠리는 워든을 무찔렀습니다", True, COLORS['pure white'])
+            title_text3 = title_font.render("보물상자는 많은 보물이 들어있었고 스탠리는 행복하게 살았다고 합니다", True, COLORS['pure white'])
+            self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
+            self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 350))
+            self.display_surface.blit(title_text3, (WINDOW_WIDTH // 2 - title_text3.get_width() // 2, 375))
+            pygame.display.update()
+
+
     def run(self):
         while self.running:
 
@@ -373,8 +393,15 @@ class Game:
                     draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
 
             pygame.display.update()
-            while pygame.time.get_ticks() - self.clockforgiant < 500:
-                pass
+            if self.player.endgame:
+                for group in (self.all_sprites, self.collision_sprites, self.transition_sprites):
+                    group.empty()
+                self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+                self.Go()
+
+            # while pygame.time.get_ticks() - self.clockforgiant < 500:
+            #     pass
 
 
 
@@ -382,6 +409,7 @@ class Game:
 
 
 
+        # pygame.quit()
         pygame.quit()
 
 
