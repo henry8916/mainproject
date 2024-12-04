@@ -28,6 +28,7 @@ class Game:
             0:Tool('Shovel',1),
             1:Tool('Gun',1),
         }
+        self.player_stat=Characterstat()
 
 
         # groups
@@ -80,7 +81,7 @@ class Game:
         }
         self.item_Frames={'HP_potion':pygame.image.load('images/items/healthpo.png'),'XP_potion':pygame.image.load('images/items/bluepo.png'),'THIRST_potion':pygame.image.load('images/items/waterbottle.png')}
         self.overworld_frames = {'Characters': all_character_import('./images/zero')}
-        self.item_Frames={'HP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'XP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'THIRST_potion':pygame.image.load(join('icons','shovel-removebg-preview.png'))}
+        self.item_Frames={'HP_potion':pygame.image.load('images/items/healthpo.png'),'XP_potion':pygame.image.load('images/items/bluepo.png'),'THIRST_potion':pygame.image.load(join('images/items/waterbottle.png'))}
         self.fonts={
             'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
@@ -124,7 +125,7 @@ class Game:
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
-                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools)
+                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools, self.player_stat)
                 self.camera = Camera(self.player,self.all_sprites)
                 # self.gun = Gun(self.player, self.all_sprites)
             if obj.name == 'Character' and obj.properties['character_id']=='zero' :
@@ -138,7 +139,7 @@ class Game:
                 print(obj.properties)
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player)
             if obj.name == 'Character' and obj.properties['character_id']=='lizard':
-                self.giant = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
+                self.warden = Giantlizard((obj.x, obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites, self.collision_sprites, self.player,self.display_surface)
 
     #엔터가 눌렸는지 확인한다 엔터가 눌렸다면 움직이지 못하게 하고 INDEX창을 연다
     # 장소에 도착한지 확인하고 인덱스 창을 연다. 나갈 수 있도록 이동 키는 가능하게 설정
@@ -225,7 +226,7 @@ class Game:
                     game.go()
             self.display_surface.fill('black')
             title_font=self.fonts['title']
-            title_text = title_font.render("holes", True, COLORS['gold'])
+            title_text = title_font.render("HOLES 고도형,이유진", True, COLORS['gold'])
             press_font=self.fonts['bold']
             press=press_font.render("press space to enter", True, COLORS['pure white'])
             self.display_surface.blit(title_text, (WINDOW_WIDTH // 2 - title_text.get_width() // 2, 300))
@@ -309,33 +310,41 @@ class Game:
             #if self.dialog_tree: self.dialog_tree.update()s
             if self.index_open:
                 self.tool_index.update(dt)
-            if self.index_open1:
+            elif self.index_open1:
                 self.player_index.update(dt)
-            if self.index_open2:
+            elif self.index_open2:
                 self.traing_index.update()
+            else:
+                # HP바
+                draw_bar(
+                    surface=self.display_surface,
+                    rect=pygame.FRect(0, 0, 100, 20).move_to(
+                        midbottom=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 70)),
+                    value=self.player.hp,
+                    max_value=self.player.max_hp,
+                    color=COLORS['red'],
+                    bg_color=COLORS['white'],
+                    radius=2)
+
 
             self.player.get_current_tool(self.tool_index.selected_tool)
             self.player_index.get_player(self.player)
+
+            #땅파기 정도
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,
                 rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-90)),
                 value=pygame.time.get_ticks()-self.key_down_time,
-                max_value=1000,
+                max_value=self.player.digtime,
                 color=COLORS['white'],
                 bg_color=COLORS['black']
             )
-            draw_bar(
-            surface=self.display_surface,
-            rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-70)),
-            value=self.player.hp,
-            max_value=self.player.max_hp,
-            color=COLORS['red'],
-            bg_color=COLORS['white'] )
-
 
 
             if self.dialog_tree: self.dialog_tree.update()
+            if pygame.key.get_just_pressed()[pygame.K_f]:
+                self.player.coin+=1
 
             if 0.0<=Game.k and Game.k<2.0:
                 Game.k+=0.01
