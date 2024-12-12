@@ -2,6 +2,7 @@ import pygame
 from os.path import join
 from os import walk
 
+#기본 세팅 및 이미지 담당
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280,720
 TILE_SIZE = 64
 ANIMATION_SPEED=6

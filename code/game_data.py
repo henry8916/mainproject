@@ -1,4 +1,4 @@
-#고도형 파트 스토리 진행
+
 PLAYER_DATA={
     'Warden' : {1:['구덩이를 파며 자신을 성찰해라','하루에 하나씩','규격은 삽 1개 길이다'],
                 2:['오늘도 구멍을 파라'],
@@ -10,10 +10,11 @@ PLAYER_DATA={
                 8:['총을 훔쳐갔군','어서 가져오지 않으면','선전포고의 의미로','받아들이겠다'],
                 9:['내가 패배했다']},
     'zero' : {1:['너의 동료가 되어 줄게','앞으로 잘 지내자','오늘부터 구멍을 파도록 해'],
-              2:['오늘도 구멍을 파야 해'],
-              3:['캠프 중심으로 가'],
-              4:['보물상자를 워든에게 보고해'],
-              5:['Mr.sir의 집으로 가서','문서를 훔쳐']},
+              2:['이제 거대 도마뱀을 잡으러 가!'],
+              3:['워든을 공격하자!'],
+              4:['열쇠를 획득했어! 보물을 찾자!','혹시 보물을 워든이..?'],
+              5:['좋아 계속해서 구멍을 파.','화이팅!'],
+              6:['혹시 Mr.sir의 집에 도움되는 물품이 있지 않을까?']},
     'Default':{1:['스탠리는 누명을 써서','이곳에 왔다.','이곳은 뭐하는 곳일까?'],
                2:['여긴 네가 새로운 사람이','될 수 있는 곳이다.','규칙만 잘 따라라'],
                3:['O 버튼을 꾹 누르면','구덩이 파기가 완료됩니다.'],
@@ -36,16 +37,16 @@ PLAYER_DATA={
 TOOL_DATA={
     'Shovel':{
         'level':{
-            1:{'plusdamage':1, 'digspeed':1, 'skill':False, 'need_coin':10 },
-            2:{'plusdamage':2, 'digspeed':2, 'skill':False,'need_coin':20},
-            3:{'plusdamage':3, 'digspeed':3, 'skill':False,'need_coin':30},
-            4:{'plusdamage':4, 'digspeed':4, 'skill':False,'need_coin':40},
-            5:{'plusdamage':5, 'digspeed':5, 'skill':True,'need_coin':50},
-            6:{'plusdamage':6, 'digspeed':6, 'skill':True,'need_coin':60},
-            7:{'plusdamage':7, 'digspeed':7, 'skill':True,'need_coin':70},
-            8:{'plusdamage':8, 'digspeed':8, 'skill':True,'need_coin':80},
-            9:{'plusdamage':9, 'digspeed':9, 'skill':True,'need_coin':90},
-            10:{'plusdamage':10, 'digspeed':10, 'skill':True,'need_coin':100}
+            1:{'plusdamage':10, 'digspeed':5, 'skill':False, 'need_coin':10 },
+            2:{'plusdamage':20, 'digspeed':10, 'skill':False,'need_coin':20},
+            3:{'plusdamage':30, 'digspeed':15, 'skill':False,'need_coin':30},
+            4:{'plusdamage':40, 'digspeed':20, 'skill':False,'need_coin':40},
+            5:{'plusdamage':50, 'digspeed':25, 'skill':True,'need_coin':50},
+            6:{'plusdamage':60, 'digspeed':30, 'skill':True,'need_coin':60},
+            7:{'plusdamage':70, 'digspeed':35, 'skill':True,'need_coin':70},
+            8:{'plusdamage':80, 'digspeed':40, 'skill':True,'need_coin':80},
+            9:{'plusdamage':90, 'digspeed':45, 'skill':True,'need_coin':90},
+            10:{'plusdamage':100, 'digspeed':50, 'skill':True,'need_coin':100}
 
         },
         'guide':{
@@ -65,16 +66,16 @@ TOOL_DATA={
     'Gun':{
         'level':{
             0:{'plusdamage':0, 'digspeed':0, 'skill':False , 'need_coin':10},
-            1:{'plusdamage':5, 'digspeed':0, 'skill':False , 'need_coin':20},
-            2:{'plusdamage':10, 'digspeed':0, 'skill':False , 'need_coin':40},
-            3:{'plusdamage':15, 'digspeed':0, 'skill':False , 'need_coin':80},
-            4:{'plusdamage':20, 'digspeed':0, 'skill':False, 'need_coin':160},
-            5:{'plusdamage':25, 'digspeed':0, 'skill':True , 'need_coin':320},
-            6:{'plusdamage':30, 'digspeed':0, 'skill':True , 'need_coin':640},
-            7:{'plusdamage':35, 'digspeed':0, 'skill':True , 'need_coin':1280},
-            8:{'plusdamage':40, 'digspeed':0, 'skill':True , 'need_coin':2560},
-            9:{'plusdamage':45, 'digspeed':0, 'skill':True , 'need_coin':5120},
-            10:{'plusdamage':50, 'digspeed':0, 'skill':True, 'need_coin':10240}
+            1:{'plusdamage':50, 'digspeed':0, 'skill':False , 'need_coin':20},
+            2:{'plusdamage':100, 'digspeed':0, 'skill':False , 'need_coin':40},
+            3:{'plusdamage':150, 'digspeed':0, 'skill':False , 'need_coin':80},
+            4:{'plusdamage':200, 'digspeed':0, 'skill':False, 'need_coin':160},
+            5:{'plusdamage':250, 'digspeed':0, 'skill':True , 'need_coin':320},
+            6:{'plusdamage':300, 'digspeed':0, 'skill':True , 'need_coin':640},
+            7:{'plusdamage':350, 'digspeed':0, 'skill':True , 'need_coin':1280},
+            8:{'plusdamage':400, 'digspeed':0, 'skill':True , 'need_coin':2560},
+            9:{'plusdamage':450, 'digspeed':0, 'skill':True , 'need_coin':5120},
+            10:{'plusdamage':500, 'digspeed':0, 'skill':True, 'need_coin':10240}
 
         },
         'guide':{
@@ -105,20 +106,18 @@ ITEM_DATA={
     }
 }
 
-
-
 STAT_DATA={
-            0:{'max_hp':100, 'need_xp':100, 'max_thirst':10, 'damage':1, 'digspeed':10},
-            1:{'max_hp':120, 'need_xp':0, 'max_thirst':20, 'damage':2,'digspeed':20},
-            2:{'max_hp':140, 'need_xp':0, 'max_thirst':30,'damage':3,'digspeed':30},
-            3:{'max_hp':160, 'need_xp':0, 'max_thirst':40,'damage':4,'digspeed':40},
-            4:{'max_hp':180, 'need_xp':0, 'max_thirst':50,'damage':5,'digspeed':50},
-            5:{'max_hp':200, 'need_xp':0, 'max_thirst':60,'damage':6,'digspeed':60},
-            6:{'max_hp':220, 'need_xp':0, 'max_thirst':70,'damage':7,'digspeed':70},
-            7:{'max_hp':240, 'need_xp':0, 'max_thirst':80,'damage':8,'digspeed':80},
-            8:{'max_hp':260, 'need_xp':0, 'max_thirst':90,'damage':9,'digspeed':90},
-            9:{'max_hp':280, 'need_xp':0, 'max_thirst':100,'damage':10,'digspeed':100},
-            10:{'max_hp':300, 'need_xp':0, 'max_thirst':200,'damage':20,'digspeed':200}
+            0:{'max_hp':100, 'need_xp':100, 'max_thirst':10, 'damage':10, 'digspeed':1},
+            1:{'max_hp':120, 'need_xp':150, 'max_thirst':20, 'damage':20,'digspeed':2},
+            2:{'max_hp':140, 'need_xp':200, 'max_thirst':30,'damage':30,'digspeed':3},
+            3:{'max_hp':160, 'need_xp':250, 'max_thirst':40,'damage':40,'digspeed':4},
+            4:{'max_hp':180, 'need_xp':300, 'max_thirst':50,'damage':50,'digspeed':5},
+            5:{'max_hp':200, 'need_xp':350, 'max_thirst':60,'damage':60,'digspeed':6},
+            6:{'max_hp':220, 'need_xp':400, 'max_thirst':70,'damage':70,'digspeed':7},
+            7:{'max_hp':240, 'need_xp':450, 'max_thirst':80,'damage':80,'digspeed':8},
+            8:{'max_hp':260, 'need_xp':500, 'max_thirst':90,'damage':90,'digspeed':9},
+            9:{'max_hp':280, 'need_xp':550, 'max_thirst':100,'damage':100,'digspeed':10},
+            10:{'max_hp':300, 'need_xp':600, 'max_thirst':200,'damage':200,'digspeed':20}
 }
 
 

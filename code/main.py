@@ -28,6 +28,7 @@ class Game:
             0:Tool('Shovel',1),
             1:Tool('Gun',1),
         }
+        self.player_stat=Characterstat()
 
 
         # groups
@@ -74,13 +75,13 @@ class Game:
 
 
     def import_assets(self):
-        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx')), 'battlefield':load_pygame(join('holesmap','battlefield.tmx'))}
+        self.tmx_maps = {'world': load_pygame(join('holesmap', 'mainmap.tmx')), 'tent':load_pygame(join('holesmap', 'Tent.tmx')), 'wardenhouse':load_pygame(join('holesmap', 'Wardenhouse.tmx')), 'hole':load_pygame(join('holesmap', 'holes.tmx')),'centerhouse':load_pygame(join('holesmap', 'finalbattle.tmx')), 'battlefield':load_pygame(join('holesmap','battlefield.tmx')), 'room':load_pygame(join('holesmap','room.tmx'))}
         self.tool_Frames={ 'icons': {'Shovel': pygame.image.load(join('icons','shovel-removebg-preview.png')).convert_alpha(),'Gun': pygame.image.load(join('icons','gun-removebg-preview.png')).convert_alpha()},
                            'tools': {}
         }
         self.item_Frames={'HP_potion':pygame.image.load('images/items/healthpo.png'),'XP_potion':pygame.image.load('images/items/bluepo.png'),'THIRST_potion':pygame.image.load('images/items/waterbottle.png')}
         self.overworld_frames = {'Characters': all_character_import('./images/zero')}
-        self.item_Frames={'HP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'XP_potion':pygame.image.load(join('icons','shovel-removebg-preview.png')),'THIRST_potion':pygame.image.load(join('icons','shovel-removebg-preview.png'))}
+        self.item_Frames={'HP_potion':pygame.image.load('images/items/healthpo.png'),'XP_potion':pygame.image.load('images/items/bluepo.png'),'THIRST_potion':pygame.image.load(join('images/items/waterbottle.png'))}
         self.fonts={
             'dialog':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),30),
             'regular':pygame.font.Font(join('font','Moneygraphy-Rounded.ttf'),18),
@@ -126,8 +127,14 @@ class Game:
 
         for obj in tmx_map.get_layer_by_name('Entities'):#타일드 멥 수정하기
             if obj.name =='Player' and obj.properties['pos']==player_start_pos:
-                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools)
+                self.player = Player((obj.x*2, obj.y*2), self.all_sprites, self.collision_sprites, self.sand_sprites,self.attack_sprites ,self.attackstanley_sprites, self.player_tools, self.player_stat)
                 self.camera = Camera(self.player,self.all_sprites)
+                self.tool_index = ToolIndex(self.player_tools, self.fonts, self.tool_Frames)
+                self.player_index = PlayerIndex(self.player, self.fonts,
+                                                pygame.image.load(join('images', 'player', 'down', '0.png')),
+                                                self.tool_Frames)
+                self.traing_index = TrainingIndex(self.fonts, self.player, self.player_tools, self.item_Frames,
+                                                  self.tool_Frames['icons'])
                 # self.gun = Gun(self.player, self.all_sprites)
             if obj.name == 'Character' and obj.properties['character_id']=='zero' :
                 print(obj.x,obj.y,1001010)
@@ -135,7 +142,8 @@ class Game:
                           frames=self.overworld_frames['Characters']['zeroall'],
                           groups=(self.all_sprites,self.collision_sprites,self.character_sprites),
                           facing_direction = obj.properties['direction'],
-                          character_data=PLAYER_DATA[obj.properties['character_id']])
+                          character_data=PLAYER_DATA[obj.properties['character_id']],
+                          player=self.player)
             if obj.name == 'Character' and obj.properties['character_id']=='warden' and self.player.level>=10:
                 print(obj.properties)
                 self.warden = Warden((obj.x,obj.y), self.all_sprites, self.attack_sprites, self.attackstanley_sprites,self.player,self.display_surface)
@@ -216,13 +224,17 @@ class Game:
             if self.tint_progress>=255:
                 print(self.transition_target)
                 print(self.player.selected_tool)
+                if self.transition_target[0]=='room':
+                    self.player.playerstat.key=True
+                if self.transition_target[0]=='battlefield':
+                    self.player.playerstat.lizard=True
                 self.setup(self.tmx_maps[self.transition_target[0]],self.transition_target[1],self.transition_target[0])
                 self.tint_mode='untint'
                 self.transition_target=None
         self.tint_progress =max(0,min(self.tint_progress,255))
         self.tint_surf.set_alpha(self.tint_progress)
         self.display_surface.blit(self.tint_surf,(0,0))
-
+    #첫번째 검은 화면
     def black_out(self):
         while True:
             for event in pygame.event.get():
@@ -231,15 +243,19 @@ class Game:
                     sys.exit()
                 if keys[pygame.K_SPACE]:
                     game.go()
+                if keys[pygame.K_q]:
+                    game.went()
             self.display_surface.fill('black')
             title_font=self.fonts['title']
-            title_text = title_font.render("holes", True, COLORS['gold'])
+            title_text = title_font.render("HOLES", True, COLORS['gold'])
             press_font=self.fonts['bold']
             press=press_font.render("press space to enter", True, COLORS['pure white'])
+            press1 = press_font.render("press q to see the manual", True, COLORS['pure white'])
             self.display_surface.blit(title_text, (WINDOW_WIDTH // 2 - title_text.get_width() // 2, 300))
             self.display_surface.blit(press, (WINDOW_WIDTH // 2 - press.get_width() // 2, 400))
+            self.display_surface.blit(press1, (WINDOW_WIDTH // 2 - press.get_width() // 2, 430))
             pygame.display.update()
-
+    #두번째 검은 화면
     def go(self):
         while True:
             for event in pygame.event.get():
@@ -257,6 +273,7 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 350))
             self.display_surface.blit(title_text3, (WINDOW_WIDTH // 2 - title_text3.get_width() // 2, 375))
             pygame.display.update()
+    #세번째 검은 화면
     def go2(self):
         while True:
             for event in pygame.event.get():
@@ -273,6 +290,22 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 375))
 
             pygame.display.update()
+    #키 설명
+    def went(self):
+        while True:
+            for event in pygame.event.get():
+                keys = pygame.key.get_pressed()
+                if event.type==pygame.QUIT:
+                    sys.exit()
+                if keys[pygame.K_q]:
+                    game.black_out()
+            self.display_surface.fill('black')
+            title_font = self.fonts['bold']
+            title_text1 = title_font.render("키 설명\n 방향키 wasd        인벤토리 enter \n 대시 space        캐릭터 정보 R_shift\n 구멍파기 o     대화하기 i     분신술 p", True, COLORS['pure white'])
+            self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
+
+            pygame.display.update()
+    #엔딩
     def Go(self):
         while True:
             for event in pygame.event.get():
@@ -293,8 +326,7 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 350))
             self.display_surface.blit(title_text3, (WINDOW_WIDTH // 2 - title_text3.get_width() // 2, 375))
             pygame.display.update()
-
-
+    #메인 while 문 코드
     def run(self):
         while self.running:
 
@@ -339,33 +371,43 @@ class Game:
             #if self.dialog_tree: self.dialog_tree.update()s
             if self.index_open:
                 self.tool_index.update(dt)
-            if self.index_open1:
+            elif self.index_open1:
                 self.player_index.update(dt)
-            if self.index_open2:
+            elif self.index_open2:
                 self.traing_index.update()
+            else:
+                # HP바
+                draw_bar(
+                    surface=self.display_surface,
+                    rect=pygame.FRect(0, 0, 100, 20).move_to(
+                        midbottom=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 70)),
+                    value=self.player.hp,
+                    max_value=self.player.max_hp,
+                    color=COLORS['red'],
+                    bg_color=COLORS['white'],
+                    radius=2)
+
 
             self.player.get_current_tool(self.tool_index.selected_tool)
             self.player_index.get_player(self.player)
+
+            #땅파기 정도
             if self.key_down_time:
                 draw_bar(
                 surface=self.display_surface,
                 rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-90)),
                 value=pygame.time.get_ticks()-self.key_down_time,
-                max_value=1000,
+                max_value=self.player.digtime,
                 color=COLORS['white'],
                 bg_color=COLORS['black']
             )
-            draw_bar(
-            surface=self.display_surface,
-            rect=pygame.FRect(0,0,100,20).move_to(midbottom=Vector2(WINDOW_WIDTH/2, WINDOW_HEIGHT/2-70)),
-            value=self.player.hp,
-            max_value=self.player.max_hp,
-            color=COLORS['red'],
-            bg_color=COLORS['white'] )
-
 
 
             if self.dialog_tree: self.dialog_tree.update()
+
+            if pygame.key.get_just_pressed()[pygame.K_f]:
+                self.player.coin+=10
+                self.player.stat_update()
 
             if 0.0<=Game.k and Game.k<2.0:
                 Game.k+=0.01
@@ -391,16 +433,23 @@ class Game:
             self.tint_screen(dt)
             if self.giant:
                 if self.giant.get_live():
+                    Character.z=6
+                    self.clockforgiant = pygame.time.get_ticks()
 
                     self.setup(self.tmx_maps['world'],'tent','world')
                     talk_rect = pygame.FRect(0, 0, WINDOW_WIDTH* 0.6, WINDOW_HEIGHT * 0.3).move_to(center=Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT * 0.7))
-                    # while pygame.time.get_ticks() - self.clockforgiant <500:
-                    #     surf = self.fonts['explain'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black'])
-                    #     rect = surf.get_frect(center=talk_rect.center)
-                    #     pygame.draw.rect(self.display_surface,COLORS['black'],talk_rect)
-                    #     self.display_surface.blit(surf, rect)
-                    #     pygame.display.update()
-                    draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
+                    self.clocking=pygame.time.get_ticks()
+                    while pygame.time.get_ticks()-self.clocking:
+                        pass
+                    print(self.clockforgiant, pygame.time.get_ticks())
+                    while pygame.time.get_ticks() - self.clockforgiant <5000:
+                        rect_x, rect_y, rect_width, rect_height = 250, 600, 780, 80
+                        pygame.draw.rect(self.display_surface, COLORS['pure white'],(rect_x, rect_y, rect_width, rect_height))
+                        title_font =  self.fonts['bold']
+                        title_text1 = title_font.render("왕도마뱀을 잡았다!", True, COLORS['black'])
+                        self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 620))
+                        pygame.display.update()
+                    # draw_text_in_box(self.display_surface,pygame.FRect(0,0,200,40).move_to(midleft=(WINDOW_WIDTH/2, WINDOW_HEIGHT)), COLORS['white'],self.fonts['regular'].render('드디어 돌연변이 고도형 닮은 노란색 도마뱀을 잡았따', False, COLORS['black']))
 
             pygame.display.update()
             if self.player.endgame:
@@ -409,14 +458,6 @@ class Game:
                 self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
                 self.Go()
-
-            # while pygame.time.get_ticks() - self.clockforgiant < 500:
-            #     pass
-
-
-
-
-
 
 
         # pygame.quit()
