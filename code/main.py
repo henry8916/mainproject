@@ -220,7 +220,7 @@ class Game:
             self.tint_progress -=self.tint_speed*dt
 
         if  self.tint_mode=='tint':
-            self.tint_progress += self.tint_speed*dts
+            self.tint_progress += self.tint_speed*dt
             if self.tint_progress>=255:
                 print(self.transition_target)
                 print(self.player.selected_tool)
@@ -458,7 +458,7 @@ class Game:
 
                 self.Go()
 
-
+        self.player.checkdie()
         # pygame.quit()
         pygame.quit()
 

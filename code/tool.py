@@ -461,8 +461,6 @@ class TrainingIndex:
         txt_surf = self.fonts['explain'].render(f'UPGRADE', False, COLORS['gold'])
         txt_rect = txt_surf.get_frect(center=bg_rect.center)
 
-
-
         if event.type == pygame.MOUSEBUTTONDOWN:
             if upgrade_rect.collidepoint(event.pos):  # 마우스가 Rect 안에 있을 때
                 self.is_pressed=True

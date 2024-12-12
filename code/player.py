@@ -622,7 +622,7 @@ class Warden(pygame.sprite.Sprite):
                 self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
                 pygame.display.update()
             self.kill()
-
+            return
         if self.hp<=0:
             self.player.endgame = True
     def shootfireball(self):
@@ -639,7 +639,6 @@ class Warden(pygame.sprite.Sprite):
     def update(self, dt):
         self.shootlizard()
         self.collisionbullet()
-        self.checkdie()
         self.fireballlizard()
         self.shootfireball()
 
