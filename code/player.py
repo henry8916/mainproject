@@ -5,6 +5,7 @@ from settings import *
 from math import *
 from game_data import *
 from support import *
+#모든 엔티티에 대한 내용
 class Entity(pygame.sprite.Sprite):
     def __init__(self,pos,frames,groups,facing_direction):
         super().__init__(groups)
@@ -48,26 +49,36 @@ class Entity(pygame.sprite.Sprite):
     def unblock(self):
         self.blocked=False
 
+#스탠리가 아닌 다른 캐릭터에 관한 내용
 class Character(Entity):
-    def __init__(self, pos, frames, groups, facing_direction,character_data):
+    z=1
+    def __init__(self, pos, frames, groups, facing_direction,character_data,player):
         super().__init__(pos, frames, groups, facing_direction)
         self.character_data = character_data
+        self.player=player
         # self.facing_direction=facing_direction
         # movement
         # self.view_directions = character_data['directions']
 
 
     def get_dialog(self):
+        if 5>self.player.playerstat.level>=2:
+            Character.z=5
+        if 10>=self.player.playerstat.level>=5 and not self.player.playerstat.lizard:
+            Character.z=2
+        if self.player.playerstat.key:
+            Character.z=4
+        if self.player.playerstat.level==10:
+            Character.z=3
 
-        return self.character_data[1]
+        return self.character_data[Character.z]
 
     def update(self,dt):
         self.animate(dt)
+#스탠리 움직이는 코드 및 스탠리 관련 코드
 class Player(pygame.sprite.Sprite):
-    def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic):
+    def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic,playerstat):
         super().__init__(groups)
-        self.specialattackcheck = True
-        self.specialattackchecktime = pygame.time.get_ticks()
         self.groups = groups
         self.load_images()
         self.state, self.frame_index = 'down', 0
@@ -100,9 +111,9 @@ class Player(pygame.sprite.Sprite):
         self.tools=['Shovel','Gun']
         self.tool = tool_dic
         self.tool_index = None
+        print(self.tool[0].level)
 
-
-        self.level = 0
+        self.level = playerstat.level
         self.max_hp = STAT_DATA[self.level]['max_hp']  #
         self.need_xp = STAT_DATA[self.level]['need_xp']  #
         self.max_thirst = STAT_DATA[self.level]['max_thirst']
@@ -110,26 +121,65 @@ class Player(pygame.sprite.Sprite):
         self.digspeed = STAT_DATA[self.level]['digspeed']
         self.stat = {'damage': self.damage, 'digspeed': self.digspeed}
         # self.selected_tool = self.tools[self.tool_index]
+        self.playerstat=playerstat
+        self.fonts = {
+            'dialog': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 30),
+            'regular': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 18),
+            'small': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 14),
+            'bold': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 40),
+            'title': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 100),
+            'explain': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 25),
+            'Mr.sir': pygame.font.Font(join('font', 'HakgyoansimTuhoOTFR.otf'), 50)
+        }
+
         #interaction
         self.sand_sprites=sand_sprites
         self.key_down_time=0 #땅파기 시작
         self.key_up_time=0 #땅파기 끝
-        self.hp=self.max_hp
-        self.xp=25
-        self.thirst=10
-        self.endgame = False
+        self.hp=playerstat.hp
+        self.xp=playerstat.xp
+        self.thirst=playerstat.thirst
+        self.endgame=False
+        self.digtime=1000/self.digspeed*60
+        self.coin=playerstat.coin
+        # self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        print(playerstat.coin)
 
 
 
-        self.coin=0
     #basuc stats
     def stat_update(self):
+
+
+        #player
         self.max_hp=STAT_DATA[self.level]['max_hp'] #
         self.need_xp=STAT_DATA[self.level]['need_xp']#
         self.max_thirst=STAT_DATA[self.level]['max_thirst']
-        self.damage=STAT_DATA[self.level]['damage']
-        self.digspeed=STAT_DATA[self.level]['digspeed']
+
+        if self.selected_tool:
+            self.damage=STAT_DATA[self.level]['damage']+self.selected_tool.plusdamage
+            self.digspeed=STAT_DATA[self.level]['digspeed']+self.selected_tool.digspeed
+        else:
+            self.damage = STAT_DATA[self.level]['damage']
+            self.digspeed = STAT_DATA[self.level]['digspeed']
+
         self.stat={'damage':self.damage, 'digspeed': self.digspeed}
+
+        #tool
+        for k,v in self.tool.items():
+            v.tool_update()
+        self.digtime = 1000 / self.digspeed * 60
+
+        if self.xp>=self.need_xp:
+            self.xp-=self.need_xp
+            self.level+=1
+        self.playerstat.level=self.level
+        self.playerstat.hp=self.hp
+        self.playerstat.xp=self.xp
+        self.playerstat.thirst=self.thirst
+        self.playerstat.coin=self.coin
+
+
     def load_images(self):
         self.frames = {'left': [], 'right':[] , 'up':[],'down':[]}
         for state in self.frames.keys():
@@ -172,11 +222,12 @@ class Player(pygame.sprite.Sprite):
             if self.selected_tool.name == 'Shovel':
                 for sand in self.sand_sprites.sprites():
                     if sand.rect.collidepoint(self.target_pos):
-                        if t>=1000:
+                        if t>=self.digtime:
                             print('hello')
                             sand.damage()
                             self.coin+=1
-                            print(self.coin)
+                            self.xp+=5
+                            #소리 넣기
     #타깃 즉 모래위치
     def get_target_pos(self):
         self.target_pos= self.rect.center
@@ -184,11 +235,6 @@ class Player(pygame.sprite.Sprite):
     #현재 장비 입력받기
     def get_current_tool(self,tool):
         self.selected_tool=tool
-    def specialattackcheckfunction(self):
-        if self.specialattackcheck == False and self.specialattackchecktime>10000:
-            self.specialattackcheck = True
-            self.specialattackchecktime = pygame.time.get_ticks()
-
 
     def running(self):
         keys = pygame.key.get_pressed()
@@ -197,14 +243,17 @@ class Player(pygame.sprite.Sprite):
         else: self.speed = 500
     def teleporting(self):
         keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_SPACE]:
-            for i in range(10):
-                PlayerClone(self.rect.center+self.direction*40*i, self.image, self.groups, i*50, 150)
-            # self.rect.centerx += (int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT]))*10
-            # self.rect.centery += (int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP]))*10
-            self.timedelay = True
-            self.hitbox_rect.center += self.direction * 280
-            self.rect.center = self.hitbox_rect.center
+        if self.selected_tool:
+            if self.selected_tool.name=='Shovel' and self.selected_tool.skill==True:
+
+                if keys[pygame.K_SPACE]:
+                    for i in range(10):
+                        PlayerClone(self.rect.center+self.direction*40*i, self.image, self.groups, i*50, 150)
+                    # self.rect.centerx += (int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT]))*10
+                    # self.rect.centery += (int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP]))*10
+                    self.timedelay = True
+                    self.hitbox_rect.center += self.direction * 280
+                    self.rect.center = self.hitbox_rect.center
     #일반공격 삽,총
     def normalattack(self):
 
@@ -252,15 +301,16 @@ class Player(pygame.sprite.Sprite):
                 PlayerClonespecial(self.rect.center - deltadirection , self.image, self.groups, 50*i, 1000, radius , pi + angle)
     def specialattack2(self):
         if pygame.key.get_just_pressed()[pygame.K_p]:
-            for i in range(21):
-                radius = 200
-                angle = 2*i*pi/20
-                deltadirection = pygame.Vector2(0,0)
-                PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle, self.attackstanley_sprites)
-            for sprite in self.attackstanley_sprites:
-                if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
-                    sprite.kill()
-            self.specialattackcheck = False
+            if self.selected_tool:
+                if self.selected_tool.name == 'Gun' and self.selected_tool.skill== True:
+                    for i in range(21):
+                        radius = 200
+                        angle = 2*i*pi/20
+                        deltadirection = pygame.Vector2(0,0)
+                        PlayerClonespecial2(self.rect.center + deltadirection , self.image, self.groups, 50*i, 4000, radius , angle, self.attackstanley_sprites)
+                    for sprite in self.attackstanley_sprites:
+                        if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
+                            sprite.kill()
     def block(self):
         self.blocked = True
         self.direction = Vector2(0, 0)
@@ -295,6 +345,9 @@ class Player(pygame.sprite.Sprite):
     #     self.image.fill((255, 0, 0), special_flags=pygame.BLEND_RGBA_MULT)
     def checkkill(self):
         if self.hp < 0:
+            # title_font = self.fonts['Mr.sir']
+            # title_text1 = title_font.render("GAME OVER", True, COLORS['pure white'])
+            # self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
             self.kill()
     def update(self,dt):
         if not self.blocked:
@@ -305,14 +358,20 @@ class Player(pygame.sprite.Sprite):
             self.move(dt)
             self.teleporting()
             self.specialattack()
-            if self.specialattackcheck == True:
-                self.specialattack2()
+            self.specialattack2()
             self.normalattack()
             self.collisionlizard()
             self.stat_update()
             self.checkkill()
-            self.specialattackcheckfunction()
-
+class Characterstat:
+    def __init__(self):
+        self.level=0
+        self.xp=0
+        self.hp=100
+        self.thirst=10
+        self.coin=1000
+        self.key=False
+        self.lizard=False
 
 class PlayerIndex:
     def __init__(self,player,fonts,image,tool_frame):
@@ -529,7 +588,7 @@ class Warden(pygame.sprite.Sprite):
         self.clockfireball = pygame.time.get_ticks()
         self.display_surface = display_surface
         self.groups = groups
-        self.hp = 2000
+        self.hp = 10000
         self.angle=0
         self.clockforfireballlizard = pygame.time.get_ticks()
         self.player = player
@@ -537,13 +596,22 @@ class Warden(pygame.sprite.Sprite):
         self.clockshootcheck = True
         self.clockshootfireball = pygame.time.get_ticks()
         self.clockshootfireball2 = pygame.time.get_ticks()
+        self.fonts = {
+            'dialog': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 30),
+            'regular': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 18),
+            'small': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 14),
+            'bold': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 40),
+            'title': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 100),
+            'explain': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 25),
+            'Mr.sir': pygame.font.Font(join('font', 'HakgyoansimTuhoOTFR.otf'), 50)
+        }
 
 
     def collisionbullet(self):
         for sprite in self.attack_sprites:
             if sprite.rect.colliderect(self.rect):
                 sprite.kill()
-                self.hp-=2000
+                self.hp-=self.player.damage
                 print(self.hp)
 
     def shootlizard(self):
@@ -561,6 +629,17 @@ class Warden(pygame.sprite.Sprite):
             self.clockfireball = pygame.time.get_ticks()
     def checkdie(self):
         if self.hp<=0:
+            self.clockforwarden=pygame.time.get_ticks()
+            while pygame.time.get_ticks() - self.clockforwarden < 3000:
+                rect_x, rect_y, rect_width, rect_height = 250, 300, 780, 80
+                pygame.draw.rect(self.display_surface, COLORS['pure white'], (rect_x, rect_y, rect_width, rect_height))
+                title_font = self.fonts['bold']
+                title_text1 = title_font.render("내가 패배했다...", True, COLORS['black'])
+                self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
+                pygame.display.update()
+            self.kill()
+            return
+        if self.hp<=0:
             self.player.endgame = True
     def shootfireball(self):
         if 5000< pygame.time.get_ticks() - self.clockshootfireball < 10000:
@@ -576,7 +655,6 @@ class Warden(pygame.sprite.Sprite):
     def update(self, dt):
         self.shootlizard()
         self.collisionbullet()
-        self.checkdie()
         self.fireballlizard()
         self.shootfireball()
 
@@ -753,7 +831,7 @@ class Giantlizard(pygame.sprite.Sprite):
         self.groups = groups
         self.collision_sprites = collision_sprites
         self.display_surface = display_surface
-        self.hp = 20000
+        self.hp = 2000
         self.angle=0
         self.clockf = pygame.time.get_ticks()
         self.player = player
@@ -763,7 +841,7 @@ class Giantlizard(pygame.sprite.Sprite):
         for sprite in self.attack_sprites:
             if sprite.rect.colliderect(self.rect):
                 sprite.kill()
-                self.hp-=2000
+                self.hp-=self.player.damage
                 print(self.hp)
 
     def shootlizard(self):

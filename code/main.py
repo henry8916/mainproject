@@ -459,7 +459,7 @@ class Game:
 
                 self.Go()
 
-
+        self.player.checkdie()
         # pygame.quit()
         pygame.quit()
 
