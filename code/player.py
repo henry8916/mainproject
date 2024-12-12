@@ -5,6 +5,7 @@ from settings import *
 from math import *
 from game_data import *
 from support import *
+#모든 엔티티에 대한 내용
 class Entity(pygame.sprite.Sprite):
     def __init__(self,pos,frames,groups,facing_direction):
         super().__init__(groups)
@@ -48,6 +49,7 @@ class Entity(pygame.sprite.Sprite):
     def unblock(self):
         self.blocked=False
 
+#스탠리가 아닌 다른 캐릭터에 관한 내용
 class Character(Entity):
     z=1
     def __init__(self, pos, frames, groups, facing_direction,character_data,player):
@@ -73,6 +75,7 @@ class Character(Entity):
 
     def update(self,dt):
         self.animate(dt)
+#스탠리 움직이는 코드 및 스탠리 관련 코드
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic,playerstat):
         super().__init__(groups)
@@ -119,6 +122,15 @@ class Player(pygame.sprite.Sprite):
         self.stat = {'damage': self.damage, 'digspeed': self.digspeed}
         # self.selected_tool = self.tools[self.tool_index]
         self.playerstat=playerstat
+        self.fonts = {
+            'dialog': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 30),
+            'regular': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 18),
+            'small': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 14),
+            'bold': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 40),
+            'title': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 100),
+            'explain': pygame.font.Font(join('font', 'Moneygraphy-Rounded.ttf'), 25),
+            'Mr.sir': pygame.font.Font(join('font', 'HakgyoansimTuhoOTFR.otf'), 50)
+        }
 
         #interaction
         self.sand_sprites=sand_sprites
@@ -130,6 +142,7 @@ class Player(pygame.sprite.Sprite):
         self.endgame=False
         self.digtime=1000/self.digspeed*60
         self.coin=playerstat.coin
+        # self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         print(playerstat.coin)
 
 
@@ -332,6 +345,9 @@ class Player(pygame.sprite.Sprite):
     #     self.image.fill((255, 0, 0), special_flags=pygame.BLEND_RGBA_MULT)
     def checkkill(self):
         if self.hp < 0:
+            # title_font = self.fonts['Mr.sir']
+            # title_text1 = title_font.render("GAME OVER", True, COLORS['pure white'])
+            # self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
             self.kill()
     def update(self,dt):
         if not self.blocked:

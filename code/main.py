@@ -234,7 +234,7 @@ class Game:
         self.tint_progress =max(0,min(self.tint_progress,255))
         self.tint_surf.set_alpha(self.tint_progress)
         self.display_surface.blit(self.tint_surf,(0,0))
-
+    #첫번째 검은 화면
     def black_out(self):
         while True:
             for event in pygame.event.get():
@@ -247,7 +247,7 @@ class Game:
                     game.went()
             self.display_surface.fill('black')
             title_font=self.fonts['title']
-            title_text = title_font.render("HOLES 고도형,이유진", True, COLORS['gold'])
+            title_text = title_font.render("HOLES", True, COLORS['gold'])
             press_font=self.fonts['bold']
             press=press_font.render("press space to enter", True, COLORS['pure white'])
             press1 = press_font.render("press q to see the manual", True, COLORS['pure white'])
@@ -255,7 +255,7 @@ class Game:
             self.display_surface.blit(press, (WINDOW_WIDTH // 2 - press.get_width() // 2, 400))
             self.display_surface.blit(press1, (WINDOW_WIDTH // 2 - press.get_width() // 2, 430))
             pygame.display.update()
-
+    #두번째 검은 화면
     def go(self):
         while True:
             for event in pygame.event.get():
@@ -273,6 +273,7 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 350))
             self.display_surface.blit(title_text3, (WINDOW_WIDTH // 2 - title_text3.get_width() // 2, 375))
             pygame.display.update()
+    #세번째 검은 화면
     def go2(self):
         while True:
             for event in pygame.event.get():
@@ -289,6 +290,7 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 375))
 
             pygame.display.update()
+    #키 설명
     def went(self):
         while True:
             for event in pygame.event.get():
@@ -303,7 +305,7 @@ class Game:
             self.display_surface.blit(title_text1, (WINDOW_WIDTH // 2 - title_text1.get_width() // 2, 325))
 
             pygame.display.update()
-
+    #엔딩
     def Go(self):
         while True:
             for event in pygame.event.get():
@@ -324,8 +326,7 @@ class Game:
             self.display_surface.blit(title_text2, (WINDOW_WIDTH // 2 - title_text2.get_width() // 2, 350))
             self.display_surface.blit(title_text3, (WINDOW_WIDTH // 2 - title_text3.get_width() // 2, 375))
             pygame.display.update()
-
-
+    #메인 while 문 코드
     def run(self):
         while self.running:
 
