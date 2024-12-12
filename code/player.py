@@ -95,6 +95,8 @@ class Player(pygame.sprite.Sprite):
         self.lastmouse = False
         self.gunlist = []
         self.ifred = False
+        self.specialattackcheck = True
+        self.specialattackchecktime = pygame.time.get_ticks()
 
 
         #movement
@@ -146,7 +148,10 @@ class Player(pygame.sprite.Sprite):
         print(playerstat.coin)
 
 
-
+    def specialattackcheckf(self):
+        if self.specialattackchecktime > 10000 and not self.specialattackcheck:
+            self.specialattackcheck = True
+            self.specialattackchecktime = pygame.time.get_ticks()
     #basuc stats
     def stat_update(self):
 
@@ -302,7 +307,7 @@ class Player(pygame.sprite.Sprite):
     def specialattack2(self):
         if pygame.key.get_just_pressed()[pygame.K_p]:
             if self.selected_tool:
-                if self.selected_tool.name == 'Gun' and self.selected_tool.skill== True:
+                if self.selected_tool.name == 'Gun' and self.selected_tool.skill== True and self.specialattackcheck:
                     for i in range(21):
                         radius = 200
                         angle = 2*i*pi/20
@@ -363,6 +368,7 @@ class Player(pygame.sprite.Sprite):
             self.collisionlizard()
             self.stat_update()
             self.checkkill()
+            self.specialattackcheckf()
 class Characterstat:
     def __init__(self):
         self.level=0
