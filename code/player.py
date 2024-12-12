@@ -66,6 +66,8 @@ class Character(Entity):
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, groups, collision_sprites, sand_sprites,attack_sprites,attackstanley_sprites, tool_dic):
         super().__init__(groups)
+        self.specialattackcheck = True
+        self.specialattackchecktime = pygame.time.get_ticks()
         self.groups = groups
         self.load_images()
         self.state, self.frame_index = 'down', 0
@@ -182,6 +184,11 @@ class Player(pygame.sprite.Sprite):
     #현재 장비 입력받기
     def get_current_tool(self,tool):
         self.selected_tool=tool
+    def specialattackcheckfunction(self):
+        if self.specialattackcheck == False and self.specialattackchecktime>10000:
+            self.specialattackcheck = True
+            self.specialattackchecktime = pygame.time.get_ticks()
+
 
     def running(self):
         keys = pygame.key.get_pressed()
@@ -253,6 +260,7 @@ class Player(pygame.sprite.Sprite):
             for sprite in self.attackstanley_sprites:
                 if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
                     sprite.kill()
+            self.specialattackcheck = False
     def block(self):
         self.blocked = True
         self.direction = Vector2(0, 0)
@@ -297,11 +305,13 @@ class Player(pygame.sprite.Sprite):
             self.move(dt)
             self.teleporting()
             self.specialattack()
-            self.specialattack2()
+            if self.specialattackcheck == True:
+                self.specialattack2()
             self.normalattack()
             self.collisionlizard()
             self.stat_update()
             self.checkkill()
+            self.specialattackcheckfunction()
 
 
 class PlayerIndex:
