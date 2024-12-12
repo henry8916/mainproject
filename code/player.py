@@ -316,6 +316,7 @@ class Player(pygame.sprite.Sprite):
                     for sprite in self.attackstanley_sprites:
                         if ((sprite.rect.x-self.rect.centerx)**2+(sprite.rect.centery - self.rect.centery)**2)**0.5 < 200:
                             sprite.kill()
+                    self.specialattackcheck = False
     def block(self):
         self.blocked = True
         self.direction = Vector2(0, 0)
